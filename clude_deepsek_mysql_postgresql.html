@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MySQL & PostgreSQL · complete concept map v2 (starter → production)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f7f9fc;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.55;
+      color: #1e293b;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 2rem;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      padding: 2.5rem 2rem;
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-bottom: 4px solid #e2e8f0;
+      padding-bottom: 1.25rem;
+      margin-bottom: 2rem;
+      color: #0f172a;
+      flex-wrap: wrap;
+    }
+
+    h1 i {
+      color: #3b82f6;
+      font-size: 2rem;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      margin-top: 2.5rem;
+      margin-bottom: 1.25rem;
+      padding-left: 0.75rem;
+      border-left: 6px solid #3b82f6;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    h2 i {
+      color: #3b82f6;
+      font-size: 1.5rem;
+      width: 2rem;
+    }
+
+    h3 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin: 1.75rem 0 1rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 0.5rem;
+    }
+
+    h3 i {
+      color: #64748b;
+      font-size: 1.1rem;
+    }
+
+    .phase-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .phase-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1.25rem;
+      padding: 1.25rem 1.75rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.15s ease;
+    }
+
+    .phase-card:hover {
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      font-size: 1.15rem;
+      color: #0f172a;
+    }
+
+    .phase-number {
+      background: #3b82f6;
+      color: white;
+      border-radius: 40px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.2rem 0.85rem;
+      letter-spacing: 0.3px;
+    }
+
+    .concept-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.75rem;
+      margin-top: 0.5rem;
+    }
+
+    .concept-tag {
+      background: #f1f5f9;
+      border-radius: 30px;
+      padding: 0.3rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #1e293b;
+      border: 1px solid #e2e8f0;
+      transition: all 0.1s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .concept-tag i {
+      font-size: 0.75rem;
+      color: #3b82f6;
+    }
+
+    .concept-tag.mysql {
+      background: #fef2f2;
+      border-color: #fecaca;
+      color: #991b1b;
+    }
+
+    .concept-tag.mysql i {
+      color: #dc2626;
+    }
+
+    .concept-tag.pg {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+      color: #1e40af;
+    }
+
+    .concept-tag.pg i {
+      color: #2563eb;
+    }
+
+    .badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.15rem 0.6rem;
+      border-radius: 100px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      margin-left: 0.3rem;
+    }
+
+    .badge-mysql {
+      background: #fee2e2;
+      color: #b91c1c;
+    }
+
+    .badge-pg {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .resource-section {
+      margin-top: 2.5rem;
+      background: #f8fafc;
+      border-radius: 1.5rem;
+      padding: 1.75rem 2rem;
+      border: 1px solid #e2e8f0;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.25rem;
+    }
+
+    .resource-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.25rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.1s ease;
+    }
+
+    .resource-card:hover {
+      transform: translateY(-2px);
+      border-color: #cbd5e1;
+    }
+
+    .resource-card h4 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .resource-card h4 i {
+      color: #3b82f6;
+    }
+
+    .resource-card p {
+      font-size: 0.9rem;
+      color: #475569;
+      margin-bottom: 0.75rem;
+    }
+
+    .resource-link {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #2563eb;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      border-bottom: 1px dashed #93c5fd;
+    }
+
+    .resource-link i {
+      font-size: 0.7rem;
+    }
+
+    .note {
+      background: #fffbeb;
+      border-left: 6px solid #f59e0b;
+      padding: 1rem 1.5rem;
+      border-radius: 0.75rem;
+      margin: 1.75rem 0;
+      font-size: 0.95rem;
+      color: #78350f;
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+
+    .note i {
+      color: #f59e0b;
+      font-size: 1.25rem;
+      margin-top: 0.1rem;
+    }
+
+    .footer-note {
+      margin-top: 3rem;
+      padding-top: 1.5rem;
+      border-top: 2px dashed #cbd5e1;
+      text-align: center;
+      font-size: 0.9rem;
+      color: #64748b;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .footer-note i {
+      color: #3b82f6;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .engine-card {
+      background: #ffffff;
+      border-radius: 1.25rem;
+      padding: 1.5rem 1.75rem;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+    }
+
+    .engine-card h4 {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .engine-card.mysql-card h4 i {
+      color: #dc2626;
+    }
+
+    .engine-card.pg-card h4 i {
+      color: #2563eb;
+    }
+
+    .engine-list {
+      list-style: none;
+    }
+
+    .engine-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.95rem;
+    }
+
+    .engine-list li i {
+      margin-top: 0.25rem;
+      font-size: 0.8rem;
+      color: #3b82f6;
+    }
+
+    /* ===== ADVANCED SECTION STYLING (separate & visually distinct) ===== */
+    .advanced-zone {
+      margin-top: 5rem;
+      padding-top: 2.5rem;
+      border-top: 6px double #cbd5e1;
+      position: relative;
+    }
+
+    .advanced-zone::before {
+      content: "⛔ FINISH FUNDAMENTALS FIRST — THEN COME BACK HERE";
+      position: absolute;
+      top: -1.1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 0.4rem 1.5rem;
+      border-radius: 100px;
+      border: 2px solid #fecaca;
+      white-space: nowrap;
+    }
+
+    .advanced-heading {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .advanced-heading i {
+      color: #8b5cf6;
+      font-size: 1.8rem;
+    }
+
+    .advanced-sub {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+
+    /* Comparison table */
+    table.comparison {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0 2rem;
+      font-size: 0.9rem;
+      background: white;
+      border-radius: 1rem;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    table.comparison th {
+      background: #0f172a;
+      color: white;
+      text-align: left;
+      padding: 0.9rem 1rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      letter-spacing: 0.3px;
+    }
+
+    table.comparison th:nth-child(2) {
+      background: #7f1d1d;
+    }
+
+    table.comparison th:nth-child(3) {
+      background: #1e3a8a;
+    }
+
+    table.comparison td {
+      padding: 0.8rem 1rem;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+
+    table.comparison tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.comparison tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    table.comparison td:first-child {
+      font-weight: 600;
+      color: #334155;
+      width: 22%;
+    }
+
+    .mysql-col {
+      color: #991b1b;
+    }
+
+    .pg-col {
+      color: #1e40af;
+    }
+
+    /* Production ops grid */
+    .prod-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .prod-card {
+      background: white;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      border: 1px solid #e2e8f0;
+      border-top: 4px solid #8b5cf6;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .prod-card h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .prod-card h4 i {
+      color: #8b5cf6;
+    }
+
+    .prod-card ul {
+      list-style: none;
+      font-size: 0.88rem;
+    }
+
+    .prod-card ul li {
+      margin-bottom: 0.45rem;
+      padding-left: 1.2rem;
+      position: relative;
+      color: #334155;
+    }
+
+    .prod-card ul li::before {
+      content: "▸";
+      position: absolute;
+      left: 0;
+      color: #8b5cf6;
+      font-weight: 700;
+    }
+
+    .dataset-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .dataset-pill {
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 100px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: #1e293b;
+      text-decoration: none;
+      transition: all 0.15s;
+    }
+
+    .dataset-pill:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e1;
+    }
+
+    .dataset-pill i {
+      color: #3b82f6;
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 1rem; }
+      .container { padding: 1.5rem; }
+      h1 { font-size: 1.6rem; }
+      .two-col { grid-template-columns: 1fr; }
+      .resource-grid { grid-template-columns: 1fr; }
+      table.comparison { font-size: 0.8rem; }
+      table.comparison th, table.comparison td { padding: 0.5rem; }
+      .advanced-zone::before { font-size: 0.6rem; padding: 0.3rem 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ========================================================= -->
+  <!-- ============ PART 1: FUNDAMENTALS (FOCUS HERE) ========== -->
+  <!-- ========================================================= -->
+
+  <h1>
+    <i class="fas fa-database"></i>
+    MySQL &amp; PostgreSQL — complete concept map
+    <span style="font-size: 1rem; font-weight: 400; color: #475569; margin-left: auto;">starter → production</span>
+  </h1>
+
+  <div style="background: #eff6ff; border-left: 6px solid #3b82f6; padding: 1rem 1.5rem; border-radius: 0.75rem; margin-bottom: 2rem; font-size: 0.95rem; color: #1e3a8a;">
+    <i class="fas fa-bullseye" style="margin-right: 0.5rem;"></i>
+    <strong>Focus zone:</strong> Everything from here down to "Websites to learn" is your core study material. The advanced comparison tables and production ops live <em>way</em> at the bottom — ignore them until Phases 1–10 feel solid.
+  </div>
+
+  <!-- ========== PHASE 1–10 ========== -->
+  <div class="phase-grid">
+
+    <!-- Phase 1 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 1</span>
+        <i class="fas fa-cubes"></i> Relational Fundamentals (must come first)
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-table"></i>Tables, rows, columns</span>
+        <span class="concept-tag"><i class="fas fa-key"></i>Primary keys, foreign keys</span>
+        <span class="concept-tag"><i class="fas fa-font"></i>Data types</span>
+        <span class="concept-tag"><i class="fas fa-question-circle"></i>NULL semantics & 3‑valued logic</span>
+        <span class="concept-tag"><i class="fas fa-shield-alt"></i>Constraints: NOT NULL, UNIQUE, CHECK, DEFAULT</span>
+        <span class="concept-tag"><i class="fas fa-sort-amount-up"></i>Primary key strategies (auto-inc / serial / UUID / composite)</span>
+        <span class="concept-tag"><i class="fas fa-link"></i>FK actions: CASCADE, SET NULL, RESTRICT, NO ACTION</span>
+        <span class="concept-tag"><i class="fas fa-chart-line"></i>Normalization (1NF–3NF/BCNF) & denormalization</span>
+      </div>
+    </div>
+
+    <!-- Phase 2 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 2</span>
+        <i class="fas fa-search"></i> Core Querying
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-filter"></i>SELECT / WHERE</span>
+        <span class="concept-tag"><i class="fas fa-project-diagram"></i>INNER, LEFT, RIGHT, FULL, CROSS, SELF JOIN</span>
+        <span class="concept-tag"><i class="fas fa-layer-group"></i>GROUP BY / HAVING vs WHERE</span>
+        <span class="concept-tag"><i class="fas fa-calculator"></i>Aggregate functions</span>
+        <span class="concept-tag"><i class="fas fa-code-branch"></i>Subqueries (correlated vs non‑correlated)</span>
+        <span class="concept-tag"><i class="fas fa-union"></i>Set operations: UNION, INTERSECT, EXCEPT</span>
+      </div>
+    </div>
+
+    <!-- Phase 3 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 3</span>
+        <i class="fas fa-magic"></i> Advanced Querying (interview sweet spot)
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-pen"></i>CTEs (WITH clause)</span>
+        <span class="concept-tag"><i class="fas fa-redo-alt"></i>Recursive CTEs</span>
+        <span class="concept-tag"><i class="fas fa-window-maximize"></i>Window functions (ROW_NUMBER, RANK, LAG/LEAD, PARTITION BY)</span>
+        <span class="concept-tag"><i class="fas fa-cubes"></i>Grouping sets</span>
+      </div>
+    </div>
+
+    <!-- Phase 4 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 4</span>
+        <i class="fas fa-hdd"></i> Engine‑specific storage model
+      </div>
+      <div class="two-col">
+        <div class="engine-card mysql-card">
+          <h4><i class="fas fa-database"></i> MySQL / InnoDB</h4>
+          <ul class="engine-list">
+            <li><i class="fas fa-circle"></i> InnoDB vs MyISAM (transactional vs legacy)</li>
+            <li><i class="fas fa-circle"></i> Clustered index: PK <em>is</em> the table structure</li>
+            <li><i class="fas fa-circle"></i> AUTO_INCREMENT behaviour & gaps</li>
+            <li><i class="fas fa-circle"></i> Character sets: utf8 vs utf8mb4 (classic gotcha)</li>
+            <li><i class="fas fa-circle"></i> JSON column support</li>
+          </ul>
+        </div>
+        <div class="engine-card pg-card">
+          <h4><i class="fas fa-elephant"></i> PostgreSQL</h4>
+          <ul class="engine-list">
+            <li><i class="fas fa-circle"></i> MVCC / heap storage — why VACUUM is mandatory</li>
+            <li><i class="fas fa-circle"></i> Sequences (explicit) vs AUTO_INCREMENT</li>
+            <li><i class="fas fa-circle"></i> JSONB vs JSON, arrays, native UUID, ENUM, ranges</li>
+            <li><i class="fas fa-circle"></i> Extensions (pg_stat_statements, PostGIS, pg_trgm)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Phase 5 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 5</span>
+        <i class="fas fa-chart-simple"></i> Indexing (huge interview topic)
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-tree"></i>B‑Tree indexes (default both)</span>
+        <span class="concept-tag"><i class="fas fa-columns"></i>Composite indexes & column order</span>
+        <span class="concept-tag"><i class="fas fa-check-double"></i>Unique indexes vs unique constraints</span>
+        <span class="concept-tag"><i class="fas fa-box"></i>Covering indexes</span>
+        <span class="concept-tag"><i class="fas fa-ban"></i>When indexes are NOT used</span>
+        <span class="concept-tag"><i class="fas fa-text-width"></i>Full‑text indexes</span>
+        <span class="concept-tag"><i class="fas fa-microscope"></i>EXPLAIN / EXPLAIN ANALYZE (both engines)</span>
+      </div>
+    </div>
+
+    <!-- Phase 6 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 6</span>
+        <i class="fas fa-lock"></i> Transactions & Concurrency
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-atom"></i>ACID properties</span>
+        <span class="concept-tag"><i class="fas fa-sliders-h"></i>Isolation levels & anomalies</span>
+        <span class="concept-tag"><i class="fas fa-lock-open"></i>Row vs table locking, shared/exclusive</span>
+        <span class="concept-tag"><i class="fas fa-skull"></i>Deadlocks & detection</span>
+        <span class="concept-tag"><i class="fas fa-handshake"></i>Optimistic vs pessimistic locking</span>
+        <span class="concept-tag"><i class="fas fa-clock"></i>MVCC deep dive (especially Postgres)</span>
+      </div>
+    </div>
+
+    <!-- Phase 7 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 7</span>
+        <i class="fas fa-puzzle-piece"></i> Schema Design at Scale
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-code-branch"></i>Migrations (safe altering)</span>
+        <span class="concept-tag"><i class="fas fa-chart-pie"></i>Partitioning (range, list, hash) + PG declarative</span>
+        <span class="concept-tag"><i class="fas fa-share-alt"></i>Sharding concepts</span>
+        <span class="concept-tag"><i class="fas fa-eye"></i>Views vs Materialized Views</span>
+        <span class="concept-tag"><i class="fas fa-cog"></i>Generated / computed columns</span>
+        <span class="concept-tag"><i class="fas fa-arrow-right"></i>Sequences (PG) vs AUTO_INCREMENT (MySQL)</span>
+      </div>
+    </div>
+
+    <!-- Phase 8 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 8</span>
+        <i class="fas fa-tachometer-alt"></i> Performance & Optimization
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-brain"></i>Query optimization mindset</span>
+        <span class="concept-tag"><i class="fas fa-repeat"></i>N+1 at raw SQL level</span>
+        <span class="concept-tag"><i class="fas fa-pool"></i>Connection pooling</span>
+        <span class="concept-tag"><i class="fas fa-hourglass-slow"></i>Slow query logs</span>
+        <span class="concept-tag"><i class="fas fa-broom"></i>Autovacuum tuning (Postgres)</span>
+        <span class="concept-tag"><i class="fas fa-copy"></i>Read replicas & replication lag</span>
+      </div>
+    </div>
+
+    <!-- Phase 9 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 9</span>
+        <i class="fas fa-shield-halved"></i> Security & Access Control
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-user-lock"></i>GRANT / REVOKE, least privilege</span>
+        <span class="concept-tag"><i class="fas fa-bug"></i>SQL injection at raw query level</span>
+        <span class="concept-tag"><i class="fas fa-user-secret"></i>Row‑Level Security (Postgres specialty)</span>
+        <span class="concept-tag"><i class="fas fa-key"></i>Encryption at rest / in transit</span>
+      </div>
+    </div>
+
+    <!-- Phase 10 -->
+    <div class="phase-card">
+      <div class="phase-header">
+        <span class="phase-number">Phase 10</span>
+        <i class="fas fa-cloud-upload-alt"></i> High Availability & Ops
+      </div>
+      <div class="concept-list">
+        <span class="concept-tag"><i class="fas fa-save"></i>Logical vs physical backups</span>
+        <span class="concept-tag"><i class="fas fa-clock"></i>Point‑in‑time recovery</span>
+        <span class="concept-tag"><i class="fas fa-sync-alt"></i>Replication (sync vs async, primary‑replica)</span>
+        <span class="concept-tag"><i class="fas fa-exclamation-triangle"></i>Failover concepts</span>
+        <span class="concept-tag"><i class="fas fa-plug"></i>Extensions (pg_stat_statements, PostGIS…)</span>
+        <span class="concept-tag"><i class="fas fa-cogs"></i>Custom functions / triggers (PL/pgSQL)</span>
+        <span class="concept-tag"><i class="fas fa-globe"></i>Foreign Data Wrappers (Postgres)</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== MySQL SPECIFIC ========== -->
+  <h2 style="margin-top: 3rem;"><i class="fas fa-database" style="color:#dc2626;"></i> MySQL‑specific concepts</h2>
+  <div class="two-col" style="grid-template-columns: 1fr;">
+    <div class="engine-card mysql-card">
+      <h4><i class="fas fa-database"></i> InnoDB & MySQL internals</h4>
+      <ul class="engine-list" style="columns: 2; column-gap: 2rem;">
+        <li><i class="fas fa-circle"></i> Storage engines: InnoDB (default, transactional) vs MyISAM (legacy)</li>
+        <li><i class="fas fa-circle"></i> InnoDB clustered index – primary key <em>is</em> the table</li>
+        <li><i class="fas fa-circle"></i> AUTO_INCREMENT gaps & behaviour</li>
+        <li><i class="fas fa-circle"></i> Replication formats: statement‑based, row‑based, mixed</li>
+        <li><i class="fas fa-circle"></i> Query cache (deprecated/removed in MySQL 8) – why it was removed</li>
+        <li><i class="fas fa-circle"></i> SHOW commands: PROCESSLIST, ENGINE INNODB STATUS</li>
+        <li><i class="fas fa-circle"></i> Character sets & collations (utf8 vs utf8mb4)</li>
+        <li><i class="fas fa-circle"></i> JSON column support (MySQL 5.7+)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ========== POSTGRESQL SPECIFIC ========== -->
+  <h2 style="margin-top: 2.5rem;"><i class="fas fa-elephant" style="color:#2563eb;"></i> PostgreSQL‑specific concepts</h2>
+  <div class="two-col" style="grid-template-columns: 1fr;">
+    <div class="engine-card pg-card">
+      <h4><i class="fas fa-elephant"></i> PostgreSQL superpowers</h4>
+      <ul class="engine-list" style="columns: 2; column-gap: 2rem;">
+        <li><i class="fas fa-circle"></i> MVCC implementation – dead tuples, VACUUM / autovacuum</li>
+        <li><i class="fas fa-circle"></i> VACUUM vs VACUUM FULL vs autovacuum tuning</li>
+        <li><i class="fas fa-circle"></i> Sequences (explicit, flexible) vs AUTO_INCREMENT</li>
+        <li><i class="fas fa-circle"></i> Advanced types: JSONB, arrays, hstore, ranges, ENUM, native UUID</li>
+        <li><i class="fas fa-circle"></i> Extensions: pg_stat_statements, PostGIS, pg_trgm, uuid‑ossp</li>
+        <li><i class="fas fa-circle"></i> Row‑Level Security (RLS) – no direct MySQL equivalent</li>
+        <li><i class="fas fa-circle"></i> Table inheritance & declarative partitioning</li>
+        <li><i class="fas fa-circle"></i> Full‑text search (native, more powerful)</li>
+        <li><i class="fas fa-circle"></i> Foreign Data Wrappers (query external sources as local tables)</li>
+        <li><i class="fas fa-circle"></i> Custom functions/procedures (PL/pgSQL, Python, etc.)</li>
+        <li><i class="fas fa-circle"></i> Triggers – more powerful & flexible</li>
+        <li><i class="fas fa-circle"></i> CTEs are “true” – recursive & flexible</li>
+        <li><i class="fas fa-circle"></i> EXPLAIN (ANALYZE, BUFFERS) – richer plan output</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    <i class="fas fa-lightbulb"></i>
+    <div><strong>Anchor concept:</strong> MySQL InnoDB clusters the table by primary key (data stored in PK order), while PostgreSQL stores rows in heap order regardless of PK. This single difference explains why indexing and performance strategies diverge so much between the two engines.</div>
+  </div>
+
+  <!-- ========== WEBSITES TO LEARN & PRACTICE ========== -->
+  <div class="resource-section">
+    <h2 style="margin-top: 0; border-left-color: #8b5cf6;"><i class="fas fa-globe" style="color:#8b5cf6;"></i> Websites to learn &amp; practice — fundamentals to advanced</h2>
+
+    <div class="resource-grid">
+      <div class="resource-card">
+        <h4><i class="fas fa-bolt"></i> SQLBolt</h4>
+        <p>Interactive lessons with instant feedback — joins, subqueries, aggregations. Perfect for Phase 1–2.</p>
+        <a href="https://sqlbolt.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> sqlbolt.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-paw"></i> SQLZoo</h4>
+        <p>In‑browser editor, progressive difficulty. Great for SELECT, JOIN, and window functions.</p>
+        <a href="https://sqlzoo.net/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> sqlzoo.net</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-chart-bar"></i> Mode Analytics SQL Tutorial</h4>
+        <p>Real analytical datasets, strong on window functions and CTEs (Phase 3).</p>
+        <a href="https://mode.com/sql-tutorial/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> mode.com/sql-tutorial</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-code"></i> LeetCode (Database)</h4>
+        <p>Interview‑style queries, filter by company & difficulty. Free tier limits some questions.</p>
+        <a href="https://leetcode.com/problemset/database/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> leetcode.com/database</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-terminal"></i> HackerRank SQL</h4>
+        <p>Structured tracks from basic SELECT to advanced analytics. Certifications available.</p>
+        <a href="https://www.hackerrank.com/domains/sql" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> hackerrank.com/sql</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-dragon"></i> DataLemur</h4>
+        <p>Real interview questions from LinkedIn, Tesla, Microsoft. Window functions & conditional aggregation.</p>
+        <a href="https://datalemur.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> datalemur.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-flask"></i> DB Fiddle</h4>
+        <p>Test MySQL & PostgreSQL side‑by‑side, shareable links. Supports multiple dialects.</p>
+        <a href="https://www.db-fiddle.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> db-fiddle.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-book"></i> Use The Index, Luke</h4>
+        <p>Deep dive into indexing across MySQL & Postgres. Exactly Phase 5 material.</p>
+        <a href="https://use-the-index-luke.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> use-the-index-luke.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-elephant"></i> PostgreSQL Documentation</h4>
+        <p>Gold‑standard reference for indexes, MVCC, query planning. Unusually well‑written.</p>
+        <a href="https://www.postgresql.org/docs/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> postgresql.org/docs</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-question"></i> Interview Query</h4>
+        <p>SQL & data science interview practice. Good for advanced patterns.</p>
+        <a href="https://www.interviewquery.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> interviewquery.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-newspaper"></i> KDnuggets</h4>
+        <p>Curated lists of SQL practice platforms and interview resources.</p>
+        <a href="https://www.kdnuggets.com/" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> kdnuggets.com</a>
+      </div>
+      <div class="resource-card">
+        <h4><i class="fas fa-database"></i> Sample datasets</h4>
+        <p>Load <strong>Sakila</strong> (MySQL), <strong>Pagila</strong> (Postgres), <strong>Chinook</strong> — practice on real schemas.</p>
+        <a href="https://github.com/lerocha/chinook-database" class="resource-link" target="_blank"><i class="fas fa-external-link-alt"></i> Chinook on GitHub</a>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top: 2rem; background: #eef2ff; border-left-color: #6366f1; color: #1e1b4b;">
+      <i class="fas fa-desktop"></i>
+      <div><strong>Pro tip for your local setup:</strong> Since you have both MySQL & PostgreSQL installed on Ubuntu, don't just use browser platforms. Load the same dataset (e.g., Chinook) into both, then run <code>EXPLAIN ANALYZE</code> on identical queries. Watching how the planner changes after adding an index is the fastest way to internalize the storage‑engine difference.</div>
+    </div>
+  </div>
+
+  <!-- ========== QUICK REFERENCE: LEARNING ORDER ========== -->
+  <h2 style="margin-top: 3rem;"><i class="fas fa-list-ol"></i> Learning order at a glance</h2>
+  <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">1. Relational fundamentals</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">2. Core querying</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">3. Advanced querying</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">4. Engine storage model</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">5. Indexing</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">6. Transactions & concurrency</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">7. Schema design at scale</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">8. Performance & optimization</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">9. Security & access control</span>
+    <span style="background: #3b82f6; color: white; padding: 0.4rem 1rem; border-radius: 30px; font-weight: 500;">10. High availability & ops</span>
+  </div>
+
+  <!-- ============================================================= -->
+  <!-- ========= PART 2: ADVANCED — COME BACK AFTER BASICS ======== -->
+  <!-- ============================================================= -->
+
+  <div class="advanced-zone">
+
+    <h2 class="advanced-heading"><i class="fas fa-rocket"></i> Advanced — MySQL vs PostgreSQL deep dive</h2>
+    <p class="advanced-sub">Do not read this until Phases 1–10 feel comfortable. This is where the real production gotchas live.</p>
+
+    <!-- ===== 1. SIDE-BY-SIDE COMPARISON TABLE ===== -->
+    <h3 style="margin-top: 1.5rem;"><i class="fas fa-columns"></i> 1 · Side‑by‑side behavioural differences (classic production bugs)</h3>
+
+    <table class="comparison">
+      <thead>
+        <tr>
+          <th>Concept</th>
+          <th>MySQL</th>
+          <th>PostgreSQL</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Default isolation level</td>
+          <td class="mysql-col">REPEATABLE READ</td>
+          <td class="pg-col">READ COMMITTED</td>
+        </tr>
+        <tr>
+          <td>FULL OUTER JOIN</td>
+          <td class="mysql-col">❌ Not supported (emulate with UNION)</td>
+          <td class="pg-col">✅ Native support</td>
+        </tr>
+        <tr>
+          <td>Boolean type</td>
+          <td class="mysql-col">TINYINT(1), TRUE/FALSE = 1/0</td>
+          <td class="pg-col">Real <code>boolean</code> type</td>
+        </tr>
+        <tr>
+          <td>Identifier case sensitivity</td>
+          <td class="mysql-col">Table names case‑sensitive on Linux, insensitive on Win/macOS</td>
+          <td class="pg-col">Unquoted identifiers folded to lowercase</td>
+        </tr>
+        <tr>
+          <td>String case sensitivity in WHERE</td>
+          <td class="mysql-col">Depends on collation (usually insensitive)</td>
+          <td class="pg-col">Case‑sensitive by default (use ILIKE / citext)</td>
+        </tr>
+        <tr>
+          <td>LIMIT / OFFSET syntax</td>
+          <td class="mysql-col"><code>LIMIT n OFFSET m</code></td>
+          <td class="pg-col"><code>LIMIT n OFFSET m</code> <em>or</em> <code>FETCH FIRST n ROWS</code></td>
+        </tr>
+        <tr>
+          <td>Auto‑increment column</td>
+          <td class="mysql-col"><code>AUTO_INCREMENT</code></td>
+          <td class="pg-col"><code>SERIAL</code> / <code>GENERATED ... AS IDENTITY</code></td>
+        </tr>
+        <tr>
+          <td>Foreign key → index</td>
+          <td class="mysql-col">✅ Auto‑creates index on FK column</td>
+          <td class="pg-col">❌ Does <strong>not</strong> auto‑create (must add manually)</td>
+        </tr>
+        <tr>
+          <td>Timestamp with timezone</td>
+          <td class="mysql-col"><code>TIMESTAMP</code> (stores UTC), <code>DATETIME</code> (no TZ)</td>
+          <td class="pg-col"><code>TIMESTAMPTZ</code> (recommended), <code>TIMESTAMP</code> (no TZ)</td>
+        </tr>
+        <tr>
+          <td>String concatenation</td>
+          <td class="mysql-col"><code>CONCAT()</code> or <code>||</code> (if PIPES_AS_CONCAT)</td>
+          <td class="pg-col"><code>||</code> or <code>CONCAT()</code></td>
+        </tr>
+        <tr>
+          <td>GROUP BY strictness</td>
+          <td class="mysql-col">Allows non‑aggregated columns (unless ONLY_FULL_GROUP_BY)</td>
+          <td class="pg-col">Strict — every non‑aggregated column must be in GROUP BY</td>
+        </tr>
+        <tr>
+          <td>NULL ordering in indexes</td>
+          <td class="mysql-col">NULLs sort first by default</td>
+          <td class="pg-col">NULLs sort last by default (ASC)</td>
+        </tr>
+        <tr>
+          <td>Regex support</td>
+          <td class="mysql-col"><code>REGEXP</code> (POSIX-ish)</td>
+          <td class="pg-col"><code>~</code>, <code>~*</code> (POSIX regex) + <code>SIMILAR TO</code></td>
+        </tr>
+        <tr>
+          <td>Upsert syntax</td>
+          <td class="mysql-col"><code>INSERT ... ON DUPLICATE KEY UPDATE</code></td>
+          <td class="pg-col"><code>INSERT ... ON CONFLICT ... DO UPDATE</code></td>
+        </tr>
+        <tr>
+          <td>Returning modified rows</td>
+          <td class="mysql-col">❌ No direct RETURNING (need workarounds)</td>
+          <td class="pg-col">✅ <code>RETURNING *</code> on INSERT/UPDATE/DELETE</td>
+        </tr>
+        <tr>
+          <td>JSON storage</td>
+          <td class="mysql-col">JSON (binary, validated)</td>
+          <td class="pg-col">JSON (text) vs JSONB (binary, indexable) — prefer JSONB</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- ===== 2. PRODUCTION OPS PHASE ===== -->
+    <h3 style="margin-top: 2.5rem;"><i class="fas fa-server"></i> 2 · Production operations (Phase 11 — beyond the core map)</h3>
+
+    <div class="prod-grid">
+      <div class="prod-card">
+        <h4><i class="fas fa-plug"></i> Connection management</h4>
+        <ul>
+          <li><code>max_connections</code> tuning</li>
+          <li><strong>MySQL:</strong> ProxySQL, MySQL Router</li>
+          <li><strong>Postgres:</strong> PgBouncer, PgPool‑II</li>
+          <li>Transaction vs session pooling modes</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-chart-line"></i> Monitoring & observability</h4>
+        <ul>
+          <li><strong>MySQL:</strong> performance_schema, sys schema, SHOW ENGINE INNODB STATUS</li>
+          <li><strong>Postgres:</strong> pg_stat_activity, pg_stat_statements, pg_stat_user_tables</li>
+          <li>Prometheus + mysqld_exporter / postgres_exporter</li>
+          <li>Grafana dashboards</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-file-alt"></i> Logging</h4>
+        <ul>
+          <li>Error logs, slow query log</li>
+          <li><strong>MySQL:</strong> <code>slow_query_log</code>, <code>long_query_time</code></li>
+          <li><strong>Postgres:</strong> <code>log_min_duration_statement</code>, <code>log_lock_waits</code></li>
+          <li>Log rotation & retention</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-sliders-h"></i> Configuration tuning</h4>
+        <ul>
+          <li><strong>MySQL:</strong> innodb_buffer_pool_size, innodb_log_file_size, innodb_flush_log_at_trx_commit</li>
+          <li><strong>Postgres:</strong> shared_buffers, work_mem, effective_cache_size, maintenance_work_mem</li>
+          <li>WAL / binlog size tuning</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-cloud-upload-alt"></i> Backup & restore tools</h4>
+        <ul>
+          <li><strong>MySQL:</strong> mysqldump, mysqlpump, mydumper, XtraBackup</li>
+          <li><strong>Postgres:</strong> pg_dump, pg_dumpall, pg_restore, pg_basebackup</li>
+          <li>Point‑in‑time recovery (PITR) with WAL / binlog archiving</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-sync-alt"></i> Replication & failover</h4>
+        <ul>
+          <li><strong>MySQL:</strong> binlog position / GTID, group replication</li>
+          <li><strong>Postgres:</strong> streaming replication, logical replication slots</li>
+          <li>Failover: Orchestrator (MySQL), Patroni / repmgr (Postgres)</li>
+          <li>Replication lag monitoring</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-clock"></i> Timeouts & safety</h4>
+        <ul>
+          <li><strong>Postgres:</strong> <code>statement_timeout</code>, <code>idle_in_transaction_session_timeout</code>, <code>lock_timeout</code></li>
+          <li><strong>MySQL:</strong> <code>max_execution_time</code>, <code>wait_timeout</code></li>
+          <li>Killing runaway queries safely</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-cloud"></i> Managed cloud services</h4>
+        <ul>
+          <li><strong>MySQL:</strong> Amazon RDS, Aurora, Cloud SQL, PlanetScale</li>
+          <li><strong>Postgres:</strong> RDS, Aurora, Cloud SQL, Supabase, Neon, Timescale</li>
+          <li>Know what you give up vs self‑hosted</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-code-branch"></i> Upgrade paths</h4>
+        <ul>
+          <li><strong>MySQL:</strong> in‑place upgrade, logical dump/reload</li>
+          <li><strong>Postgres:</strong> pg_upgrade (in‑place), pg_dump/pg_restore (logical)</li>
+          <li>Major version breaking changes to watch</li>
+        </ul>
+      </div>
+
+      <div class="prod-card">
+        <h4><i class="fas fa-layer-group"></i> ORM integration (Laravel / Eloquent)</h4>
+        <ul>
+          <li>How Eloquent generates different SQL per driver</li>
+          <li>JSON column queries: MySQL vs Postgres syntax</li>
+          <li>Upsert, RETURNING, and lock behaviours</li>
+          <li>Migrations that work on both engines</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ===== 3. SAMPLE DATASETS (direct links) ===== -->
+    <h3 style="margin-top: 2.5rem;"><i class="fas fa-database"></i> 3 · Sample datasets — direct links</h3>
+    <p style="color: #475569; font-size: 0.95rem; margin-bottom: 1rem;">Load the same dataset into both engines and compare query plans. This is where theory becomes intuition.</p>
+
+    <div class="dataset-row">
+      <a href="https://dev.mysql.com/doc/sakila/en/" class="dataset-pill" target="_blank">
+        <i class="fas fa-database"></i> Sakila (MySQL official)
+      </a>
+      <a href="https://github.com/devrimgunduz/pagila" class="dataset-pill" target="_blank">
+        <i class="fas fa-elephant"></i> Pagila (Postgres port of Sakila)
+      </a>
+      <a href="https://github.com/lerocha/chinook-database" class="dataset-pill" target="_blank">
+        <i class="fas fa-music"></i> Chinook (cross‑engine)
+      </a>
+      <a href="https://www.postgresqltutorial.com/postgresql-sample-database/" class="dataset-pill" target="_blank">
+        <i class="fas fa-book"></i> DVD Rental (Postgres sample)
+      </a>
+      <a href="https://github.com/zonkyio/embedded-postgres" class="dataset-pill" target="_blank">
+        <i class="fas fa-flask"></i> Embedded Postgres (testing)
+      </a>
+    </div>
+
+    <div class="note" style="margin-top: 2rem; background: #f0fdf4; border-left-color: #22c55e; color: #166534;">
+      <i class="fas fa-check-circle"></i>
+      <div><strong>How to use this advanced section:</strong> Come back to it once you've finished Phase 10. The comparison table alone will save you hours of debugging. The production ops grid is what separates "knows SQL" from "can run a database in production."</div>
+    </div>
+
+  </div>
+  <!-- ===== END ADVANCED ZONE ===== -->
+
+  <div class="footer-note">
+    <i class="fas fa-database"></i> MySQL &amp; PostgreSQL — complete concept map v2 · starter → production · no concept missing
+    <i class="fas fa-elephant"></i>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,542 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg-body); color: var(--text-primary); padding: 20px; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+
+  :root {
+    --bg-body: #f8f9fc;
+    --bg-card: #ffffff;
+    --bg-secondary: #f1f3f7;
+    --bg-tertiary: #e9ecf2;
+    --border-color: #dce0e8;
+    --text-primary: #1a1d24;
+    --text-secondary: #4a4f5e;
+    --text-tertiary: #7a8094;
+    --text-info: #1e6f9f;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-body: #111318;
+      --bg-card: #1a1d26;
+      --bg-secondary: #222631;
+      --bg-tertiary: #2a2f3c;
+      --border-color: #333a4a;
+      --text-primary: #eaeef5;
+      --text-secondary: #b0b8cc;
+      --text-tertiary: #7a84a0;
+      --text-info: #7bb9e6;
+      --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+  }
+
+  .intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border-left: 4px solid #61dafb;
+    margin-bottom: 24px;
+  }
+  .intro strong { color: var(--text-primary); }
+
+  .stage {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+    transition: border-color .2s;
+  }
+  .stage:hover { border-color: #8a9bb5; }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-secondary);
+    transition: background .2s;
+    flex-wrap: wrap;
+  }
+  .stage-header:hover { background: var(--bg-tertiary); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .stage-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 120px;
+  }
+  .stage-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .chevron {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    transition: transform .25s;
+    margin-left: 2px;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  .stage-body {
+    display: none;
+    padding: 14px 18px 20px;
+    border-top: 1px solid var(--border-color);
+  }
+  .stage-body.open { display: block; }
+
+  .stage-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .stage-desc .project-highlight {
+    display: inline-block;
+    background: var(--bg-tertiary);
+    padding: 0 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  @media (max-width: 540px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .skill-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .skill-card:hover {
+    border-color: #6b8bb0;
+    background: var(--bg-tertiary);
+  }
+  .skill-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .skill-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .resource-box {
+    margin-top: 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+  }
+  .resource-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .resource-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  .resource-item {
+    font-size: 12px;
+    color: var(--text-info);
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .resource-item:hover { opacity: .7; text-decoration: underline; }
+
+  /* MERN-inspired colours */
+  .b1 { background: #d4edda; color: #0e5e2b; }
+  .b2 { background: #cce5ff; color: #004085; }
+  .b3 { background: #ffe5cc; color: #8a4b0a; }
+  .b4 { background: #e2d9f5; color: #4a2d8a; }
+  .b5 { background: #f8d7da; color: #8b1a2b; }
+  .b6 { background: #d1ecf1; color: #0c5460; }
+  .b7 { background: #fff3cd; color: #6d5a0a; }
+  .b8 { background: #d6d8db; color: #383d42; }
+  .b9 { background: #cff4fc; color: #055160; }
+  .b10 { background: #e7d9f0; color: #5a2d7a; }
+  .b11 { background: #fce4d6; color: #9b4a1a; }
+  .b12 { background: #d5e8d0; color: #1f6b3a; }
+
+  @media (prefers-color-scheme: dark) {
+    .b1 { background: #1a4a2a; color: #8fd4a0; }
+    .b2 { background: #1a3a6a; color: #9ac2f0; }
+    .b3 { background: #5a3a0a; color: #f5c78a; }
+    .b4 { background: #3a2a6a; color: #c8baf0; }
+    .b5 { background: #5a1a2a; color: #f0aab0; }
+    .b6 { background: #1a4a5a; color: #8ad0e0; }
+    .b7 { background: #5a4a0a; color: #f5dc8a; }
+    .b8 { background: #2a2a2a; color: #b0b0b0; }
+    .b9 { background: #1a4a5a; color: #8ad0e0; }
+    .b10 { background: #3a2a5a; color: #c8baf0; }
+    .b11 { background: #5a2a1a; color: #f5c8b0; }
+    .b12 { background: #1a4a3a; color: #8fd4b0; }
+  }
+
+  .footer-note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+  }
+  .footer-note a { color: var(--text-info); text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <strong>🌐 MERN Stack Deep Roadmap — Production‑Ready Essentials</strong><br>
+    This is not a beginner tutorial. You’ll dive into each component of the MERN stack (MongoDB, Express, React, Node.js) at an advanced level, with a strong focus on integration, performance, security, and real‑world patterns. Every stage includes a <strong>mini‑project</strong> and clickable skills for deeper dives.
+  </div>
+
+  <div id="stages"></div>
+
+  <div class="footer-note">
+    🚀 Click any skill card to search for in‑depth explanations & code examples.<br>
+    Each resource is a direct link to official docs or top‑tier guides.
+  </div>
+</div>
+
+<script>
+const stages = [
+  {
+    num: "01",
+    title: "MERN Architecture & Project Setup",
+    badge: "b1",
+    label: "Foundation",
+    sub: "Project: Monorepo structure",
+    desc: `<span class="project-highlight">📁 Set up a full‑stack MERN project</span> — organise frontend (React) and backend (Express + Node) in a monorepo, configure environment variables, and establish a development workflow.`,
+    skills: [
+      { name: "Monorepo vs separate repos", desc: "Pros and cons, tools like npm workspaces, turborepo" },
+      { name: "Environment configuration (dotenv)", desc: "Manage .env for dev, test, production" },
+      { name: "Concurrent development (concurrently, nodemon)", desc: "Run both servers with hot reload" },
+      { name: "Project folder structure (backend, frontend, shared types)", desc: "Scalable organisation" },
+      { name: "ESLint + Prettier setup", desc: "Code quality and consistency" },
+      { name: "Git hooks with husky", desc: "Pre‑commit linting and testing" },
+    ],
+    resources: [
+      { label: "MERN stack official guide", url: "https://www.mongodb.com/languages/mern-stack-tutorial" },
+      { label: "npm workspaces", url: "https://docs.npmjs.com/cli/v7/using-npm/workspaces" },
+      { label: "ESLint + Prettier", url: "https://eslint.org/" },
+    ]
+  },
+  {
+    num: "02",
+    title: "MongoDB – Data Modeling & Aggregation",
+    badge: "b2",
+    label: "Database",
+    sub: "Project: E‑commerce product catalog",
+    desc: `<span class="project-highlight">📦 Design MongoDB schemas for a product catalog</span> — embed vs reference, indexes, and complex aggregations for reporting.`,
+    skills: [
+      { name: "Schema design – embedding vs referencing", desc: "One‑to‑many, many‑to‑many relationships" },
+      { name: "Indexing strategies (single, compound, text, geospatial)", desc: "Performance optimisation" },
+      { name: "MongoDB aggregation pipeline", desc: "$match, $group, $unwind, $lookup, $project" },
+      { name: "Mongoose – schemas, models, middleware", desc: "Validation, hooks (pre/post), virtuals" },
+      { name: "Transactions (ACID) in MongoDB", desc: "Multi‑document atomic operations" },
+      { name: "Change streams & real‑time triggers", desc: "React to database changes" },
+    ],
+    resources: [
+      { label: "MongoDB Docs – Data Modeling", url: "https://www.mongodb.com/docs/manual/data-modeling/" },
+      { label: "Aggregation Pipeline", url: "https://www.mongodb.com/docs/manual/aggregation/" },
+      { label: "Mongoose Guide", url: "https://mongoosejs.com/docs/guide.html" },
+    ]
+  },
+  {
+    num: "03",
+    title: "Express.js – Advanced Routing & Middleware",
+    badge: "b3",
+    label: "Backend",
+    sub: "Project: RESTful API with versioning",
+    desc: `<span class="project-highlight">🌐 Build a versioned API</span> — organise routes, create custom middleware for logging, authentication, and error handling, and implement rate limiting.`,
+    skills: [
+      { name: "Router-level middleware and sub‑apps", desc: "Modular route organisation" },
+      { name: "Error‑handling middleware (centralised)", desc: "Consistent error responses" },
+      { name: "Request validation with Joi / Zod", desc: "Validate body, params, query" },
+      { name: "Rate limiting (express‑rate‑limit)", desc: "Protect against DDoS" },
+      { name: "Compression (express‑compression)", desc: "Gzip responses for performance" },
+      { name: "API versioning (URL, header, query)", desc: "Strategies for backward compatibility" },
+    ],
+    resources: [
+      { label: "Express.js Docs", url: "https://expressjs.com/" },
+      { label: "Zod validation", url: "https://zod.dev/" },
+      { label: "Rate limiting middleware", url: "https://www.npmjs.com/package/express-rate-limit" },
+    ]
+  },
+  {
+    num: "04",
+    title: "React – Component Architecture & Hooks",
+    badge: "b4",
+    label: "Frontend",
+    sub: "Project: Dashboard UI",
+    desc: `<span class="project-highlight">🧩 Build a reusable dashboard</span> — master functional components, hooks (useState, useEffect, useContext, useReducer), and custom hooks.`,
+    skills: [
+      { name: "Functional components & props", desc: "Type checking with PropTypes / TypeScript" },
+      { name: "useState, useEffect – lifecycle & side effects", desc: "Data fetching, subscriptions" },
+      { name: "useContext – global state without Redux", desc: "Theme, user authentication" },
+      { name: "useReducer – complex state logic", desc: "Alternative to Redux for local state" },
+      { name: "Custom Hooks – reusability", desc: "Encapsulate and share logic" },
+      { name: "React DevTools – profiling & debugging", desc: "Inspect props, state, and performance" },
+    ],
+    resources: [
+      { label: "React Docs – Hooks", url: "https://react.dev/reference/react" },
+      { label: "Custom Hooks guide", url: "https://react.dev/learn/reusing-logic-with-custom-hooks" },
+      { label: "React DevTools", url: "https://react.dev/learn/react-developer-tools" },
+    ]
+  },
+  {
+    num: "05",
+    title: "Node.js – Async, Streams & Performance",
+    badge: "b5",
+    label: "Runtime",
+    sub: "Project: File upload & processing",
+    desc: `<span class="project-highlight">📁 Handle large file uploads with streams</span> — use Node.js streams, child processes, and cluster to build a high‑performance file processing service.`,
+    skills: [
+      { name: "Event Loop & non‑blocking I/O", desc: "Understanding concurrency model" },
+      { name: "Streams (readable, writable, transform)", desc: "Process large data chunk‑by‑chunk" },
+      { name: "Child processes (spawn, fork, exec)", desc: "Run CPU‑intensive tasks in separate processes" },
+      { name: "Cluster module for multi‑core", desc: "Scale Node.js across CPUs" },
+      { name: "Memory profiling (heap snapshots, clinic)", desc: "Detect memory leaks" },
+      { name: "Worker Threads", desc: "Parallel execution of JavaScript" },
+    ],
+    resources: [
+      { label: "Node.js Streams", url: "https://nodejs.org/api/stream.html" },
+      { label: "Cluster module", url: "https://nodejs.org/api/cluster.html" },
+      { label: "Clinic.js – performance", url: "https://clinicjs.org/" },
+    ]
+  },
+  {
+    num: "06",
+    title: "Authentication & Authorization (JWT, OAuth)",
+    badge: "b6",
+    label: "Security",
+    sub: "Project: User auth with roles",
+    desc: `<span class="project-highlight">🔐 Implement JWT authentication with refresh tokens</span> — plus role‑based access control (RBAC) and OAuth2 (Google/GitHub) integration.`,
+    skills: [
+      { name: "JWT – sign, verify, refresh tokens", desc: "Access & refresh token flow" },
+      { name: "Password hashing with bcrypt/argon2", desc: "Secure storage" },
+      { name: "Authentication middleware in Express", desc: "Protect routes, attach user" },
+      { name: "Role‑based middleware", desc: "Check user roles for route access" },
+      { name: "OAuth2 with Passport.js (Google, GitHub)", desc: "Third‑party login" },
+      { name: "CSRF protection & secure cookies", desc: "Defend against cross‑site attacks" },
+    ],
+    resources: [
+      { label: "JWT.io", url: "https://jwt.io/" },
+      { label: "Passport.js", url: "https://www.passportjs.org/" },
+      { label: "OWASP Authentication Cheat Sheet", url: "https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html" },
+    ]
+  },
+  {
+    num: "07",
+    title: "Real‑time with Socket.io",
+    badge: "b7",
+    label: "Realtime",
+    sub: "Project: Live chat / notifications",
+    desc: `<span class="project-highlight">💬 Build a real‑time chat</span> — integrate Socket.io with Express and React, manage rooms, and broadcast events.`,
+    skills: [
+      { name: "Socket.io server & client setup", desc: "Attach to HTTP server, handle connections" },
+      { name: "Emitting events (io.emit, socket.emit, broadcast)", desc: "Target individual or group" },
+      { name: "Rooms & namespaces", desc: "Private rooms, chat channels" },
+      { name: "Authentication with Socket.io", desc: "Pass JWT in handshake" },
+      { name: "Adapter for scaling (Redis adapter)", desc: "Share state across multiple instances" },
+      { name: "Fallback transports (polling, websocket)", desc: "Reliable connection" },
+    ],
+    resources: [
+      { label: "Socket.io Docs", url: "https://socket.io/docs/v4/" },
+      { label: "Redis Pub/Sub", url: "https://redis.io/docs/manual/pubsub/" },
+    ]
+  },
+  {
+    num: "08",
+    title: "State Management (Redux Toolkit & Context)",
+    badge: "b8",
+    label: "State",
+    sub: "Project: Shopping cart with Redux",
+    desc: `<span class="project-highlight">🛒 Manage global state with Redux Toolkit</span> — handle complex state (cart, user, products) and async actions with createAsyncThunk.`,
+    skills: [
+      { name: "Redux Toolkit – configureStore, createSlice", desc: "Simplified Redux setup" },
+      { name: "Redux DevTools – time‑travel debugging", desc: "Inspect actions and state" },
+      { name: "Async actions with createAsyncThunk", desc: "Handle API calls and loading states" },
+      { name: "Selectors with memoization (reselect)", desc: "Optimised derived data" },
+      { name: "React‑Redux – useSelector, useDispatch", desc: "Connect React components" },
+      { name: "Zustand / Jotai as alternatives", desc: "Lighter state management" },
+    ],
+    resources: [
+      { label: "Redux Toolkit Docs", url: "https://redux-toolkit.js.org/" },
+      { label: "Reselect", url: "https://github.com/reduxjs/reselect" },
+      { label: "Zustand", url: "https://docs.pmnd.rs/zustand" },
+    ]
+  },
+  {
+    num: "09",
+    title: "Integration & API Communication",
+    badge: "b9",
+    label: "Connect",
+    sub: "Project: Full‑stack CRUD",
+    desc: `<span class="project-highlight">🔗 Connect React frontend to Express API</span> — use fetch/axios, handle CORS, implement caching, and manage authentication tokens.`,
+    skills: [
+      { name: "Axios interceptors for token refresh", desc: "Automatically refresh JWT" },
+      { name: "CORS configuration in Express", desc: "Allow cross‑origin requests" },
+      { name: "API service layer in React", desc: "Centralise API calls" },
+      { name: "Data caching with React Query (TanStack Query)", desc: "Server‑state management" },
+      { name: "Error handling and retry strategies", desc: "Robust API interactions" },
+      { name: "API rate limiting and throttling", desc: "Client‑side and server‑side" },
+    ],
+    resources: [
+      { label: "Axios Docs", url: "https://axios-http.com/" },
+      { label: "TanStack Query", url: "https://tanstack.com/query" },
+      { label: "CORS MDN", url: "https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS" },
+    ]
+  },
+  {
+    num: "10",
+    title: "Testing – Unit, Integration & E2E",
+    badge: "b10",
+    label: "Quality",
+    sub: "Project: Full test suite",
+    desc: `<span class="project-highlight">✅ Write tests for backend and frontend</span> — unit tests with Jest, integration tests with Supertest, React Testing Library, and end‑to‑end with Cypress.`,
+    skills: [
+      { name: "Jest – test runner for Node and React", desc: "expect, mocks, spies" },
+      { name: "Supertest – Express integration tests", desc: "Test API endpoints" },
+      { name: "React Testing Library – component testing", desc: "User‑centric queries, fireEvent" },
+      { name: "Mocking API calls (MSW, jest.mock)", desc: "Simulate network" },
+      { name: "E2E with Cypress / Playwright", desc: "Full browser automation" },
+      { name: "Coverage reports and CI", desc: "Enforce quality gates" },
+    ],
+    resources: [
+      { label: "Jest", url: "https://jestjs.io/" },
+      { label: "React Testing Library", url: "https://testing-library.com/react" },
+      { label: "Cypress", url: "https://www.cypress.io/" },
+    ]
+  },
+  {
+    num: "11",
+    title: "Performance Optimization",
+    badge: "b11",
+    label: "Performance",
+    sub: "Project: Optimise a slow app",
+    desc: `<span class="project-highlight">⚡ Identify and fix bottlenecks</span> — in React (memoization, code splitting, virtualization) and Node (streams, clustering, caching).`,
+    skills: [
+      { name: "React.memo, useMemo, useCallback", desc: "Prevent re‑renders" },
+      { name: "Code splitting with dynamic imports + React.lazy", desc: "Reduce bundle size" },
+      { name: "Virtualization (react‑window) for long lists", desc: "Render only visible rows" },
+      { name: "Database query optimisation (indexes, aggregation)", desc: "Reduce response time" },
+      { name: "Caching with Redis (Express middleware)", desc: "Cache API responses" },
+      { name: "Lighthouse & Web Vitals", desc: "Measure and improve" },
+    ],
+    resources: [
+      { label: "React Performance", url: "https://react.dev/learn/render-and-commit" },
+      { label: "Redis caching", url: "https://redis.io/docs/manual/caching/" },
+      { label: "Web Vitals", url: "https://web.dev/vitals/" },
+    ]
+  },
+  {
+    num: "12",
+    title: "Deployment & DevOps (Docker, CI/CD)",
+    badge: "b12",
+    label: "Production",
+    sub: "Project: Deploy to cloud",
+    desc: `<span class="project-highlight">🚀 Deploy MERN app with Docker and CI/CD</span> — containerise, set up reverse proxy (Nginx), and implement monitoring with Prometheus/Grafana.`,
+    skills: [
+      { name: "Dockerfile & Docker Compose", desc: "Multi‑container setup (app, MongoDB, Redis)" },
+      { name: "CI/CD pipeline (GitHub Actions)", desc: "Automated testing and deployment" },
+      { name: "Reverse proxy with Nginx", desc: "Serve static files, load balancing" },
+      { name: "Environment‑specific configs", desc: "Production vs staging" },
+      { name: "Monitoring with Sentry, LogRocket", desc: "Error tracking and performance" },
+      { name: "Scalability – horizontal scaling, load balancer", desc: "Handle high traffic" },
+    ],
+    resources: [
+      { label: "Docker + Node", url: "https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" },
+      { label: "GitHub Actions", url: "https://docs.github.com/en/actions" },
+      { label: "Sentry for React/Node", url: "https://docs.sentry.io/" },
+    ]
+  }
+];
+
+const container = document.getElementById('stages');
+
+stages.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'stage';
+  el.innerHTML = `
+    <div class="stage-header" onclick="toggle(${i})">
+      <span class="badge ${s.badge}">${s.num} — ${s.label}</span>
+      <span class="stage-title">${s.title}</span>
+      <span class="stage-sub">${s.sub}</span>
+      <span class="chevron" id="chev${i}">▼</span>
+    </div>
+    <div class="stage-body" id="body${i}">
+      <div class="stage-desc">${s.desc}</div>
+      <div class="skills-grid">
+        ${s.skills.map(sk => `
+          <div class="skill-card" onclick="sendPrompt('Explain in depth: ${sk.name} in MERN stack with code examples and real‑world use cases')">
+            <div class="skill-name">${sk.name}</div>
+            <div class="skill-desc">${sk.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="resource-box">
+        <div class="resource-title">📚 Resources</div>
+        <div class="resource-list">
+          ${s.resources.map(r => `<span class="resource-item" onclick="openLink('${r.url}')">→ ${r.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+function toggle(i) {
+  const body = document.getElementById('body'+i);
+  const chev = document.getElementById('chev'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function openLink(url) {
+  window.open(url, '_blank');
+}
+
+function sendPrompt(text) {
+  const query = encodeURIComponent(text);
+  window.open(`https://www.google.com/search?q=${query}`, '_blank');
+}
+
+toggle(0);
+</script>

@@ -1,0 +1,496 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg-body); color: var(--text-primary); padding: 20px; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+
+  :root {
+    --bg-body: #f8f9fc;
+    --bg-card: #ffffff;
+    --bg-secondary: #f1f3f7;
+    --bg-tertiary: #e9ecf2;
+    --border-color: #dce0e8;
+    --text-primary: #1a1d24;
+    --text-secondary: #4a4f5e;
+    --text-tertiary: #7a8094;
+    --text-info: #1e6f9f;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-body: #111318;
+      --bg-card: #1a1d26;
+      --bg-secondary: #222631;
+      --bg-tertiary: #2a2f3c;
+      --border-color: #333a4a;
+      --text-primary: #eaeef5;
+      --text-secondary: #b0b8cc;
+      --text-tertiary: #7a84a0;
+      --text-info: #7bb9e6;
+      --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+  }
+
+  .intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border-left: 4px solid #3b8fc2;
+    margin-bottom: 24px;
+  }
+  .intro strong { color: var(--text-primary); }
+
+  .stage {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+    transition: border-color .2s;
+  }
+  .stage:hover { border-color: #8a9bb5; }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-secondary);
+    transition: background .2s;
+    flex-wrap: wrap;
+  }
+  .stage-header:hover { background: var(--bg-tertiary); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .stage-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 120px;
+  }
+  .stage-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .chevron {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    transition: transform .25s;
+    margin-left: 2px;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  .stage-body {
+    display: none;
+    padding: 14px 18px 20px;
+    border-top: 1px solid var(--border-color);
+  }
+  .stage-body.open { display: block; }
+
+  .stage-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .stage-desc .project-highlight {
+    display: inline-block;
+    background: var(--bg-tertiary);
+    padding: 0 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  @media (max-width: 540px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .skill-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .skill-card:hover {
+    border-color: #6b8bb0;
+    background: var(--bg-tertiary);
+  }
+  .skill-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .skill-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .resource-box {
+    margin-top: 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+  }
+  .resource-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .resource-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  .resource-item {
+    font-size: 12px;
+    color: var(--text-info);
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .resource-item:hover { opacity: .7; text-decoration: underline; }
+
+  .b1 { background: #d4edda; color: #0e5e2b; }
+  .b2 { background: #cce5ff; color: #004085; }
+  .b3 { background: #ffe5cc; color: #8a4b0a; }
+  .b4 { background: #e2d9f5; color: #4a2d8a; }
+  .b5 { background: #f8d7da; color: #8b1a2b; }
+  .b6 { background: #d1ecf1; color: #0c5460; }
+  .b7 { background: #fff3cd; color: #6d5a0a; }
+  .b8 { background: #d6d8db; color: #383d42; }
+  .b9 { background: #cff4fc; color: #055160; }
+  .b10 { background: #e7d9f0; color: #5a2d7a; }
+
+  @media (prefers-color-scheme: dark) {
+    .b1 { background: #1a4a2a; color: #8fd4a0; }
+    .b2 { background: #1a3a6a; color: #9ac2f0; }
+    .b3 { background: #5a3a0a; color: #f5c78a; }
+    .b4 { background: #3a2a6a; color: #c8baf0; }
+    .b5 { background: #5a1a2a; color: #f0aab0; }
+    .b6 { background: #1a4a5a; color: #8ad0e0; }
+    .b7 { background: #5a4a0a; color: #f5dc8a; }
+    .b8 { background: #2a2a2a; color: #b0b0b0; }
+    .b9 { background: #1a4a5a; color: #8ad0e0; }
+    .b10 { background: #3a2a5a; color: #c8baf0; }
+  }
+
+  .footer-note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+  }
+  .footer-note a { color: var(--text-info); text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <strong>⚡ Deep Node.js Roadmap — Production‑Ready Essentials</strong><br>
+    This is not a beginner tutorial. You’ll dive into the runtime internals, build high‑performance APIs, handle streams, secure auth, background jobs, and architect for scale. Every stage includes a <strong>real‑world mini‑project</strong> and clickable skills for deeper dives.
+  </div>
+
+  <div id="stages"></div>
+
+  <div class="footer-note">
+    🚀 Click any skill card to search for in‑depth explanations & code examples.<br>
+    Each resource is a direct link to official docs or top‑tier guides.
+  </div>
+</div>
+
+<script>
+const stages = [
+  {
+    num: "01",
+    title: "Node.js Core & Event Loop",
+    badge: "b1",
+    label: "Internals",
+    sub: "Project: CLI tool with async I/O",
+    desc: `<span class="project-highlight">🔧 Build a CSV processor</span> — read large files, transform data, and write results. Understand the event loop, microtasks, and how Node.js achieves non‑blocking concurrency.`,
+    skills: [
+      { name: "Event Loop phases (timers, I/O, idle, poll, check, close)", desc: "How Node.js schedules and executes asynchronous code" },
+      { name: "setTimeout, setImmediate, process.nextTick", desc: "Differences and when to use each" },
+      { name: "Microtasks vs Macrotasks", desc: "Promise callbacks vs I/O callbacks" },
+      { name: "Non‑blocking I/O with libuv", desc: "Underlying C++ thread pool and event loop" },
+      { name: "Error handling in async code", desc: "try/catch, unhandledRejection, uncaughtException" },
+      { name: "Cluster module & child processes", desc: "Leverage multi‑core systems" },
+    ],
+    resources: [
+      { label: "Node.js Event Loop Guide", url: "https://nodejs.org/en/docs/guides/event-loop-timers-and-nexttick/" },
+      { label: "libuv documentation", url: "https://libuv.org/" },
+      { label: "Node.js Cluster", url: "https://nodejs.org/api/cluster.html" },
+    ]
+  },
+  {
+    num: "02",
+    title: "Modules, NPM & Package Management",
+    badge: "b2",
+    label: "Ecosystem",
+    sub: "Project: Custom CLI tool",
+    desc: `<span class="project-highlight">📦 Create an npm package</span> — build a reusable module, publish it, and manage dependencies. Learn the differences between CommonJS, ESM, and how package resolution works.`,
+    skills: [
+      { name: "CommonJS vs ECMAScript Modules", desc: "require() vs import/export — compatibility and migration" },
+      { name: "Package.json – fields explained", desc: "main, exports, types, scripts, dependencies, peerDependencies" },
+      { name: "Semver & versioning", desc: "caret, tilde, and semantic versioning rules" },
+      { name: "npm workspaces & monorepos", desc: "Managing multiple packages in one repo" },
+      { name: "Publishing packages (npm publish)", desc: "Scoped packages, public vs private" },
+      { name: "Lockfiles (package-lock.json, yarn.lock)", desc: "Why they exist and how to use them" },
+    ],
+    resources: [
+      { label: "npm Docs", url: "https://docs.npmjs.com/" },
+      { label: "Node.js Modules", url: "https://nodejs.org/api/modules.html" },
+      { label: "Semver Calculator", url: "https://semver.npmjs.com/" },
+    ]
+  },
+  {
+    num: "03",
+    title: "File System & Streams",
+    badge: "b3",
+    label: "I/O Mastery",
+    sub: "Project: Log file analyzer",
+    desc: `<span class="project-highlight">📊 Parse multi‑gigabyte log files</span> — use streams to process data chunk‑by‑chunk, transform on the fly, and handle backpressure like a pro.`,
+    skills: [
+      { name: "fs API – sync, callback, promises", desc: "readFile, writeFile, stat, watch, etc." },
+      { name: "Readable & Writable streams", desc: "createReadStream, createWriteStream, pipe, pipeline" },
+      { name: "Transform streams & duplex", desc: "Modify data as it passes through (e.g., gzip, encryption)" },
+      { name: "Backpressure handling", desc: "How streams manage memory when consumer is slower" },
+      { name: "File descriptors & buffering", desc: "Understanding underlying OS handles" },
+      { name: "Watch files with fs.watch / chokidar", desc: "React to file changes" },
+    ],
+    resources: [
+      { label: "Node.js Stream API", url: "https://nodejs.org/api/stream.html" },
+      { label: "fs module docs", url: "https://nodejs.org/api/fs.html" },
+      { label: "Streams Handbook", url: "https://github.com/substack/stream-handbook" },
+    ]
+  },
+  {
+    num: "04",
+    title: "HTTP & Express Deep Dive",
+    badge: "b4",
+    label: "Web Framework",
+    sub: "Project: RESTful API with versioning",
+    desc: `<span class="project-highlight">🌐 Build a versioned REST API</span> — use Express, organize routes, handle JSON/XML, and implement custom middleware. Learn the lifecycle of an HTTP request in Node.`,
+    skills: [
+      { name: "HTTP module (request & response)", desc: "Underlying http.createServer, IncomingMessage, ServerResponse" },
+      { name: "Express basics – app, routing, middleware", desc: "app.get, app.use, next()" },
+      { name: "Route parameters, query strings, body parsing", desc: "req.params, req.query, req.body (with body‑parser)" },
+      { name: "Router-level middleware & sub‑apps", desc: "express.Router() for modular routes" },
+      { name: "Custom middleware for logging, auth, compression", desc: "Writing your own middleware stack" },
+      { name: "Error‑handling middleware", desc: "(err, req, res, next) – centralized error responses" },
+    ],
+    resources: [
+      { label: "Express.js Official", url: "https://expressjs.com/" },
+      { label: "HTTP module docs", url: "https://nodejs.org/api/http.html" },
+      { label: "Express error handling", url: "https://expressjs.com/en/guide/error-handling.html" },
+    ]
+  },
+  {
+    num: "05",
+    title: "Database Integration (Prisma / Mongoose)",
+    badge: "b5",
+    label: "Data Layer",
+    sub: "Project: E‑commerce product catalog",
+    desc: `<span class="project-highlight">🛒 Build a product catalog with PostgreSQL and Prisma</span> — define models, run migrations, and handle complex relations (categories, variants, reviews). Alternatively, use MongoDB with Mongoose.`,
+    skills: [
+      { name: "Prisma schema & migrations", desc: "Declarative models, one‑to‑many, many‑to‑many, indexes" },
+      { name: "Prisma Client – CRUD with type safety", desc: "create, findMany, update, delete, include, select" },
+      { name: "Raw SQL & transactions", desc: "$queryRaw, $transaction for advanced control" },
+      { name: "Mongoose (for MongoDB) – schemas, models, queries", desc: "Document relationships, populate, aggregation" },
+      { name: "Connection pooling & optimization", desc: "Max connections, timeouts, retry logic" },
+      { name: "Database seeding & factories", desc: "Generate test data automatically" },
+    ],
+    resources: [
+      { label: "Prisma Docs", url: "https://www.prisma.io/docs" },
+      { label: "Mongoose Docs", url: "https://mongoosejs.com/" },
+      { label: "PostgreSQL Guide", url: "https://www.postgresql.org/docs/" },
+    ]
+  },
+  {
+    num: "06",
+    title: "Authentication & Authorization (JWT, OAuth)",
+    badge: "b6",
+    label: "Security",
+    sub: "Project: User auth + roles",
+    desc: `<span class="project-highlight">🔐 Implement JWT auth with refresh tokens</span> — register, login, protected routes, and role‑based middleware. Also integrate OAuth2 (Google, GitHub) as a bonus.`,
+    skills: [
+      { name: "JWT – sign, verify, decode", desc: "jsonwebtoken library, algorithms (HS256, RS256)" },
+      { name: "Password hashing with bcrypt / argon2", desc: "Salt rounds, compare" },
+      { name: "Authentication middleware", desc: "Extract token from Authorization header, attach user to req" },
+      { name: "Refresh token strategy", desc: "Short‑lived access token + long‑lived refresh token" },
+      { name: "Role‑based access control (RBAC)", desc: "Middleware that checks user.role against allowed roles" },
+      { name: "OAuth2 with Passport.js", desc: "Google, GitHub, Facebook strategies" },
+    ],
+    resources: [
+      { label: "JWT.io", url: "https://jwt.io/" },
+      { label: "Passport.js", url: "https://www.passportjs.org/" },
+      { label: "bcrypt npm", url: "https://www.npmjs.com/package/bcrypt" },
+    ]
+  },
+  {
+    num: "07",
+    title: "WebSockets & Real‑time Communication",
+    badge: "b7",
+    label: "Real‑time",
+    sub: "Project: Live chat / notifications",
+    desc: `<span class="project-highlight">💬 Build a real‑time chat with Socket.io</span> — handle connections, rooms, and private messages. Also implement broadcast events like Laravel’s event broadcasting.`,
+    skills: [
+      { name: "Socket.io server & client", desc: "Attach to HTTP server, handle connection events" },
+      { name: "Emitting events – io.emit, socket.emit, broadcast", desc: "Target specific clients or rooms" },
+      { name: "Rooms & namespaces", desc: "Group clients (e.g., chat rooms, game rooms)" },
+      { name: "Authentication with Socket.io", desc: "Pass JWT in handshake, verify before connection" },
+      { name: "Adapter for scaling (Redis adapter)", desc: "Share state across multiple Node instances" },
+      { name: "Fallback transports (polling, websocket)", desc: "Reliable connection in various network conditions" },
+    ],
+    resources: [
+      { label: "Socket.io Docs", url: "https://socket.io/docs/v4/" },
+      { label: "Redis Pub/Sub", url: "https://redis.io/docs/manual/pubsub/" },
+      { label: "WebSocket RFC", url: "https://datatracker.ietf.org/doc/html/rfc6455" },
+    ]
+  },
+  {
+    num: "08",
+    title: "Queues & Background Jobs",
+    badge: "b8",
+    label: "Asynchronous",
+    sub: "Project: Email worker & file processing",
+    desc: `<span class="project-highlight">📨 Offload heavy tasks to background workers</span> — use Bull (Redis) or Agenda (MongoDB) to queue jobs, retry failures, and monitor progress. Like Laravel’s queues but in Node.`,
+    skills: [
+      { name: "Bull / BullMQ – job queues with Redis", desc: "Add jobs, process workers, concurrency" },
+      { name: "Job lifecycle – added, active, completed, failed", desc: "Listen to events, handle retries" },
+      { name: "Scheduled jobs with cron (node‑cron, agenda)", desc: "Recurring tasks (e.g., daily reports)" },
+      { name: "Separate worker processes", desc: "Run workers in separate Node processes or containers" },
+      { name: "Job monitoring with Bull Board", desc: "Visual dashboard for queues" },
+      { name: "Idempotency & error handling", desc: "Ensure jobs are processed exactly once, handle timeouts" },
+    ],
+    resources: [
+      { label: "BullMQ Docs", url: "https://docs.bullmq.io/" },
+      { label: "Agenda (MongoDB)", url: "https://github.com/agenda/agenda" },
+      { label: "Redis docs", url: "https://redis.io/docs/" },
+    ]
+  },
+  {
+    num: "09",
+    title: "Testing, Debugging & Performance",
+    badge: "b9",
+    label: "Quality",
+    sub: "Project: Full test suite + profiling",
+    desc: `<span class="project-highlight">✅ Write unit, integration, and E2E tests</span> with Jest / Mocha. Add CI pipeline (GitHub Actions). Profile and optimize memory/CPU with built‑in tools.`,
+    skills: [
+      { name: "Jest – unit & integration tests", desc: "describe, it, expect, mocks, spies" },
+      { name: "Supertest for API testing", desc: "Test Express endpoints without actual network" },
+      { name: "Test coverage (istanbul/nyc)", desc: "Measure and enforce coverage thresholds" },
+      { name: "Debugging – --inspect, VS Code, ndb", desc: "Chrome DevTools, breakpoints, watch" },
+      { name: "Performance profiling – clinic, 0x, --prof", desc: "Flame graphs, CPU sampling" },
+      { name: "Memory leak detection (heap snapshots)", desc: "Use Chrome DevTools memory panel, heapdump" },
+    ],
+    resources: [
+      { label: "Jest Docs", url: "https://jestjs.io/" },
+      { label: "Clinic.js", url: "https://clinicjs.org/" },
+      { label: "Node.js Debugging Guide", url: "https://nodejs.org/en/docs/guides/debugging-getting-started/" },
+    ]
+  },
+  {
+    num: "10",
+    title: "Production Deployment & Monitoring",
+    badge: "b10",
+    label: "DevOps",
+    sub: "Project: Deploy to cloud + monitor",
+    desc: `<span class="project-highlight">🚀 Deploy a production‑ready app</span> — use PM2 or Docker, set up reverse proxy (Nginx), configure logging, health checks, and monitoring with Prometheus / New Relic.`,
+    skills: [
+      { name: "Process management with PM2", desc: "start, stop, reload, logs, ecosystem.config.js" },
+      { name: "Docker & Docker Compose", desc: "Containerize Node app, multi‑service setup (DB, Redis, Nginx)" },
+      { name: "Environment configuration", desc: "Separate .env for dev, test, prod – dotenv" },
+      { name: "Logging – Winston / Pino", desc: "Structured logs, log rotation, centralised logging" },
+      { name: "Health check endpoints", desc: "/health, /ready for orchestration" },
+      { name: "Monitoring – Prometheus, Grafana, New Relic", desc: "Track memory, CPU, request rates, errors" },
+    ],
+    resources: [
+      { label: "PM2 Quick Start", url: "https://pm2.keymetrics.io/docs/usage/quick-start/" },
+      { label: "Docker + Node Guide", url: "https://nodejs.org/en/docs/guides/nodejs-docker-webapp/" },
+      { label: "Winston logging", url: "https://github.com/winstonjs/winston" },
+    ]
+  }
+];
+
+const container = document.getElementById('stages');
+
+stages.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'stage';
+  el.innerHTML = `
+    <div class="stage-header" onclick="toggle(${i})">
+      <span class="badge ${s.badge}">${s.num} — ${s.label}</span>
+      <span class="stage-title">${s.title}</span>
+      <span class="stage-sub">${s.sub}</span>
+      <span class="chevron" id="chev${i}">▼</span>
+    </div>
+    <div class="stage-body" id="body${i}">
+      <div class="stage-desc">${s.desc}</div>
+      <div class="skills-grid">
+        ${s.skills.map(sk => `
+          <div class="skill-card" onclick="sendPrompt('Explain in depth: ${sk.name} in Node.js with code examples and real‑world use cases')">
+            <div class="skill-name">${sk.name}</div>
+            <div class="skill-desc">${sk.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="resource-box">
+        <div class="resource-title">📚 Resources</div>
+        <div class="resource-list">
+          ${s.resources.map(r => `<span class="resource-item" onclick="openLink('${r.url}')">→ ${r.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+function toggle(i) {
+  const body = document.getElementById('body'+i);
+  const chev = document.getElementById('chev'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function openLink(url) {
+  window.open(url, '_blank');
+}
+
+function sendPrompt(text) {
+  const query = encodeURIComponent(text);
+  window.open(`https://www.google.com/search?q=${query}`, '_blank');
+}
+
+toggle(0);
+</script>

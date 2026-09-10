@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laravel Complete Reference — Foundations to Internals</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg-soft:#11161d; --panel:#161b22; --panel-2:#1c2229;
+    --border:#262d36; --border-soft:#1f262e;
+    --text:#e6edf3; --text-dim:#9aa6b2; --text-faint:#6b7785;
+    --red:#ff4d4f; --red-soft:#3a1f20; --red-dim:#cf6679;
+    --green:#3fb950; --yellow:#e3b341; --blue:#58a6ff; --purple:#bc8cff; --orange:#ff8a4c;
+    --code-bg:#0a0e13; --radius:10px;
+    --mono:'JetBrains Mono', 'Fira Code', Consolas, Menlo, monospace;
+    --sans:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);
+    font-size:15px; line-height:1.65; scroll-behavior:smooth;}
+  a{color:var(--blue); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+
+  /* ===== Layout ===== */
+  .app{display:flex; min-height:100vh;}
+  .sidebar{
+    width:300px; flex-shrink:0; background:var(--bg-soft); border-right:1px solid var(--border);
+    position:fixed; top:0; left:0; height:100vh; overflow-y:auto; padding:18px 14px 80px;
+    z-index:50;
+  }
+  .sidebar::-webkit-scrollbar{width:8px;}
+  .sidebar::-webkit-scrollbar-thumb{background:var(--border); border-radius:4px;}
+  .main{margin-left:300px; flex:1; min-width:0; padding:36px 48px 120px; max-width:980px;}
+
+  .brand{display:flex; align-items:center; gap:10px; padding:4px 8px 16px; border-bottom:1px solid var(--border-soft); margin-bottom:14px;}
+  .brand svg{flex-shrink:0;}
+  .brand-text{font-weight:800; font-size:17px; letter-spacing:-0.3px;}
+  .brand-text span{color:var(--red);}
+  .brand-sub{font-size:11px; color:var(--text-faint); margin-top:1px;}
+
+  .search-box{position:relative; margin-bottom:14px;}
+  .search-box input{
+    width:100%; background:var(--panel); border:1px solid var(--border); color:var(--text);
+    padding:9px 12px 9px 32px; border-radius:8px; font-size:13px; font-family:var(--sans);
+  }
+  .search-box input:focus{outline:none; border-color:var(--red-dim);}
+  .search-box::before{content:"🔍"; position:absolute; left:10px; top:8px; font-size:13px; opacity:0.5;}
+  .search-hint{font-size:11px; color:var(--text-faint); margin:4px 2px 12px;}
+  #searchResults{display:none; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; margin-bottom:10px; max-height:300px; overflow-y:auto;}
+  #searchResults a{display:block; padding:7px 10px; font-size:12.5px; color:var(--text-dim); border-bottom:1px solid var(--border-soft);}
+  #searchResults a:hover{background:var(--panel); color:var(--text); text-decoration:none;}
+  #searchResults a b{color:var(--yellow);}
+
+  .nav-part{margin-bottom:2px;}
+  .nav-part-title{
+    display:flex; align-items:center; justify-content:space-between; cursor:pointer;
+    padding:8px 10px; border-radius:7px; font-weight:700; font-size:12.5px;
+    text-transform:uppercase; letter-spacing:0.5px; color:var(--text-dim);
+    user-select:none;
+  }
+  .nav-part-title:hover{background:var(--panel);}
+  .nav-part-title .chev{transition:transform .15s ease; font-size:10px; color:var(--text-faint);}
+  .nav-part.open .chev{transform:rotate(90deg);}
+  .nav-sections{display:none; padding-left:6px; margin-bottom:6px;}
+  .nav-part.open .nav-sections{display:block;}
+  .nav-sections a{
+    display:block; padding:6px 10px 6px 16px; font-size:13px; color:var(--text-dim);
+    border-left:2px solid transparent; border-radius:0 6px 6px 0;
+  }
+  .nav-sections a:hover{color:var(--text); text-decoration:none; border-left-color:var(--border);}
+  .nav-sections a.active{color:var(--red-dim); border-left-color:var(--red); background:var(--panel); font-weight:600;}
+
+  /* ===== Content ===== */
+  h1.page-title{font-size:30px; font-weight:800; margin:0 0 6px; letter-spacing:-0.5px;}
+  .page-sub{color:var(--text-dim); font-size:15px; margin-bottom:34px; max-width:720px;}
+
+  .part-divider{
+    margin:60px 0 30px; padding-top:30px; border-top:1px solid var(--border-soft);
+  }
+  .part-divider:first-child{margin-top:0; padding-top:0; border-top:none;}
+  .part-tag{
+    display:inline-block; font-size:11px; font-weight:700; letter-spacing:0.6px;
+    text-transform:uppercase; padding:4px 10px; border-radius:5px; margin-bottom:10px;
+  }
+  .part-tag.p1{background:#1f2d1f; color:var(--green);}
+  .part-tag.p2{background:#2a2030; color:var(--purple);}
+  .part-tag.p3{background:#2d2418; color:var(--yellow);}
+  .part-tag.p4{background:#1f2a30; color:var(--blue);}
+  .part-tag.p5{background:#33231a; color:var(--orange);}
+  .part-tag.p6{background:#301f23; color:var(--red-dim);}
+  .part-title{font-size:26px; font-weight:800; margin:0 0 8px;}
+  .part-desc{color:var(--text-dim); max-width:680px; margin-bottom:10px;}
+
+  section.concept{
+    margin-bottom:42px; padding-bottom:6px; scroll-margin-top:20px;
+  }
+  h2.concept-title{
+    font-size:20px; font-weight:700; margin:0 0 6px; display:flex; align-items:center; gap:9px;
+    border-bottom: 1px solid var(--border-soft); padding-bottom:12px;
+  }
+  h3.sub-title{font-size:15.5px; font-weight:700; margin:22px 0 8px; color:var(--text);}
+  .concept-body p{color:#c9d1d9; margin:10px 0;}
+  .concept-body ul, .concept-body ol{color:#c9d1d9; padding-left:22px; margin:10px 0;}
+  .concept-body li{margin:4px 0;}
+  .concept-body code.inline{
+    background:var(--panel-2); color:var(--orange); padding:1.5px 6px; border-radius:4px;
+    font-family:var(--mono); font-size:13px; border:1px solid var(--border-soft);
+  }
+
+  .version-note{
+    background:#1a1f14; border:1px solid #3a3a1f; border-left:3px solid var(--yellow);
+    border-radius:6px; padding:10px 14px; margin:14px 0; font-size:13px; color:#d9cf9a;
+  }
+  .version-note b{color:var(--yellow);}
+  .tip{
+    background:#13201a; border:1px solid #1f3a2c; border-left:3px solid var(--green);
+    border-radius:6px; padding:10px 14px; margin:14px 0; font-size:13px; color:#b9d9c4;
+  }
+  .tip b{color:var(--green);}
+  .warn{
+    background:#241616; border:1px solid #3a1f1f; border-left:3px solid var(--red);
+    border-radius:6px; padding:10px 14px; margin:14px 0; font-size:13px; color:#e0b3b4;
+  }
+  .warn b{color:var(--red);}
+
+  pre{
+    background:var(--code-bg); border:1px solid var(--border); border-radius:8px;
+    padding:14px 16px; overflow-x:auto; margin:12px 0; font-size:13px;
+  }
+  pre code{font-family:var(--mono); line-height:1.6; white-space:pre;}
+  .code-label{
+    font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.5px;
+    margin:14px 0 -4px; font-weight:600;
+  }
+
+  /* syntax token colors (manual, no JS lib) */
+  .tk-kw{color:#ff7b72;}      /* keywords: function, return, public, use, class, new, if, foreach */
+  .tk-fn{color:#d2a8ff;}      /* function/method names */
+  .tk-str{color:#a5d6ff;}     /* strings */
+  .tk-com{color:#6b7785; font-style:italic;}  /* comments */
+  .tk-var{color:#79c0ff;}     /* variables */
+  .tk-class{color:#ffa657;}   /* class names / facades */
+  .tk-num{color:#79c0ff;}
+
+  table.ref-table{width:100%; border-collapse:collapse; margin:14px 0; font-size:13.5px;}
+  table.ref-table th{
+    background:var(--panel); text-align:left; padding:9px 12px; color:var(--text-dim);
+    font-weight:700; border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:0.3px;
+  }
+  table.ref-table td{padding:9px 12px; border-bottom:1px solid var(--border-soft); vertical-align:top;}
+  table.ref-table tr:hover td{background:var(--panel-2);}
+  table.ref-table code.inline{white-space:nowrap;}
+
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;}
+  @media (max-width:900px){.grid-2{grid-template-columns:1fr;}}
+
+  .top-progress{position:fixed; top:0; left:300px; right:0; height:3px; background:var(--red); width:0%; z-index:100; transition:width .1s linear;}
+
+  .toc-jump{
+    position:fixed; bottom:24px; right:30px; background:var(--panel); border:1px solid var(--border);
+    color:var(--text-dim); width:42px; height:42px; border-radius:50%; display:flex; align-items:center;
+    justify-content:center; cursor:pointer; font-size:16px; box-shadow:0 4px 14px rgba(0,0,0,.4); z-index:60;
+  }
+  .toc-jump:hover{color:var(--text); border-color:var(--text-faint);}
+
+  @media (max-width: 880px){
+    .sidebar{transform:translateX(-100%); transition:transform .2s ease; width:280px;}
+    .sidebar.mobile-open{transform:translateX(0);}
+    .main{margin-left:0; padding:24px 18px 100px;}
+    .top-progress{left:0;}
+    .mobile-toggle{display:flex !important;}
+  }
+  .mobile-toggle{
+    display:none; position:fixed; top:14px; left:14px; z-index:70; background:var(--panel);
+    border:1px solid var(--border); color:var(--text); width:38px; height:38px; border-radius:8px;
+    align-items:center; justify-content:center; cursor:pointer; font-size:16px;
+  }
+</style>
+</head>
+<body>
+
+<div class="top-progress" id="topProgress"></div>
+<div class="mobile-toggle" id="mobileToggle">☰</div>
+
+<div class="app">
+  <nav class="sidebar" id="sidebar">
+    <div class="brand">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 2L21 7V17L12 22L3 17V7L12 2Z" stroke="#ff4d4f" stroke-width="1.6"/><path d="M12 2V22M3 7L21 17M21 7L3 17" stroke="#ff4d4f" stroke-width="1"/></svg>
+      <div>
+        <div class="brand-text">Laravel <span>Complete</span></div>
+        <div class="brand-sub">Foundations → Internals · L8–L13</div>
+      </div>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Search concepts, methods...">
+    </div>
+    <div id="searchResults"></div>
+    <div class="search-hint">e.g. "withCount", "policy", "chunk"</div>
+
+    <div id="navTree"></div>
+  </nav>
+
+  <main class="main" id="mainContent">
+
+    <h1 class="page-title">Laravel Complete Reference</h1>
+    <p class="page-sub">Every core concept used in real production Laravel apps — from request lifecycle to container internals. Targets <b>Laravel 12/13</b> syntax, with version notes wherever behavior changed since Laravel 8. One example per concept — no fluff, no repetition.</p>
+
+    <!-- ============================================================ -->
+    <!-- PART 1: FOUNDATIONS -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-1">
+      <span class="part-tag p1">Part 1</span>
+      <h2 class="part-title">Foundations</h2>
+      <p class="part-desc">Request lifecycle, routing, middleware, controllers, Blade, and validation — the layer every Laravel app is built on.</p>
+    </div>
+
+    <section class="concept" id="request-lifecycle">
+      <h2 class="concept-title">🔄 Request Lifecycle</h2>
+      <div class="concept-body">
+        <p>Every request to a Laravel app follows the same path: <code class="inline">public/index.php</code> boots the app, creates the <b>Service Container</b>, then hands the request to either the HTTP Kernel or Console Kernel. The HTTP Kernel runs the request through global middleware, then the <b>Router</b> matches it to a route, runs route-specific middleware, and finally executes the controller (or closure), which returns a <code class="inline">Response</code> that flows back out through the middleware stack.</p>
+        <h3 class="sub-title">The flow in order</h3>
+        <ol>
+          <li><code class="inline">public/index.php</code> — entry point, loads autoloader + bootstraps the app</li>
+          <li><code class="inline">bootstrap/app.php</code> — builds the Application (the container) and registers core bindings</li>
+          <li><b>HTTP Kernel</b> — sends the request through global middleware (CORS, trim strings, etc.)</li>
+          <li><b>Service Providers</b> — all registered providers' <code class="inline">register()</code> then <code class="inline">boot()</code> methods run</li>
+          <li><b>Router</b> — matches the URI + method to a route, resolves route middleware</li>
+          <li><b>Controller / Closure</b> — runs your business logic, returns data or a Response</li>
+          <li>Response flows back out through middleware, then is sent to the browser</li>
+        </ol>
+        <div class="version-note"><b>Laravel 11+ note:</b> Prior to L11, this flow was wired through <code class="inline">app/Http/Kernel.php</code> and a heavier <code class="inline">app/Console/Kernel.php</code>. Laravel 11 introduced the <b>slim skeleton</b> — middleware, routing, and exception handling are now configured directly in <code class="inline">bootstrap/app.php</code>, and Kernel.php files are gone by default for new apps (still supported for upgraded apps).</div>
+      </div>
+    </section>
+
+    <section class="concept" id="installation-structure">
+      <h2 class="concept-title">📁 Installation &amp; Directory Structure</h2>
+      <div class="concept-body">
+        <div class="code-label">Install a new project</div>
+        <pre><code><span class="tk-kw">composer</span> create-project laravel/laravel example-app
+<span class="tk-com"># or via the Laravel installer</span>
+<span class="tk-kw">laravel</span> new example-app</code></pre>
+        <h3 class="sub-title">Key directories</h3>
+        <table class="ref-table">
+          <tr><th>Path</th><th>Purpose</th></tr>
+          <tr><td><code class="inline">app/Models</code></td><td>Eloquent models</td></tr>
+          <tr><td><code class="inline">app/Http/Controllers</code></td><td>Controllers</td></tr>
+          <tr><td><code class="inline">app/Http/Middleware</code></td><td>Custom middleware</td></tr>
+          <tr><td><code class="inline">app/Providers</code></td><td>Service providers</td></tr>
+          <tr><td><code class="inline">routes/web.php</code></td><td>Browser/session routes</td></tr>
+          <tr><td><code class="inline">routes/api.php</code></td><td>Stateless API routes (token auth, no CSRF)</td></tr>
+          <tr><td><code class="inline">resources/views</code></td><td>Blade templates</td></tr>
+          <tr><td><code class="inline">database/migrations</code></td><td>Schema migrations</td></tr>
+          <tr><td><code class="inline">database/factories</code></td><td>Model factories for seeding/testing</td></tr>
+          <tr><td><code class="inline">database/seeders</code></td><td>Database seeders</td></tr>
+          <tr><td><code class="inline">config/*.php</code></td><td>All framework + package configuration</td></tr>
+          <tr><td><code class="inline">.env</code></td><td>Environment-specific secrets/settings (never commit)</td></tr>
+          <tr><td><code class="inline">bootstrap/app.php</code></td><td>App bootstrapping — middleware, routing, exceptions (L11+)</td></tr>
+          <tr><td><code class="inline">storage/</code></td><td>Logs, compiled views, file uploads (local disk)</td></tr>
+        </table>
+        <div class="version-note"><b>L11+:</b> <code class="inline">routes/api.php</code> and <code class="inline">routes/channels.php</code> no longer exist by default — run <code class="inline">php artisan install:api</code> or <code class="inline">install:broadcasting</code> to add them back when needed.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="routing">
+      <h2 class="concept-title">🛣️ Routing</h2>
+      <div class="concept-body">
+        <p>Routes map a URI + HTTP verb to a closure or controller action. Defined in <code class="inline">routes/web.php</code> (or <code class="inline">api.php</code>).</p>
+
+        <div class="code-label">Basic routes</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/users'</span>, [<span class="tk-class">UserController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'index'</span>]);
+<span class="tk-class">Route</span>::<span class="tk-fn">post</span>(<span class="tk-str">'/users'</span>, [<span class="tk-class">UserController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'store'</span>]);
+<span class="tk-class">Route</span>::<span class="tk-fn">put</span>(<span class="tk-str">'/users/{user}'</span>, [<span class="tk-class">UserController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'update'</span>]);
+<span class="tk-class">Route</span>::<span class="tk-fn">delete</span>(<span class="tk-str">'/users/{user}'</span>, [<span class="tk-class">UserController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'destroy'</span>]);</code></pre>
+
+        <div class="code-label">Route parameters (required, optional, constrained)</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/posts/{id}'</span>, <span class="tk-kw">function</span> (<span class="tk-kw">string</span> <span class="tk-var">$id</span>) { ... });
+<span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/posts/{id?}'</span>, <span class="tk-kw">function</span> (<span class="tk-kw">?string</span> <span class="tk-var">$id</span> = <span class="tk-kw">null</span>) { ... }); <span class="tk-com">// optional</span>
+<span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/posts/{id}'</span>, ...)-><span class="tk-fn">where</span>(<span class="tk-str">'id'</span>, <span class="tk-str">'[0-9]+'</span>); <span class="tk-com">// regex constraint</span></code></pre>
+
+        <div class="code-label">Named routes</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/profile'</span>, [<span class="tk-class">ProfileController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'show'</span>])-><span class="tk-fn">name</span>(<span class="tk-str">'profile.show'</span>);
+<span class="tk-com">// usage anywhere:</span>
+<span class="tk-fn">route</span>(<span class="tk-str">'profile.show'</span>, [<span class="tk-str">'user'</span> => <span class="tk-num">1</span>]); <span class="tk-com">// -> /profile/1</span></code></pre>
+
+        <div class="code-label">Route groups (prefix, middleware, name)</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">prefix</span>(<span class="tk-str">'admin'</span>)-><span class="tk-fn">middleware</span>([<span class="tk-str">'auth'</span>, <span class="tk-str">'verified'</span>])-><span class="tk-fn">name</span>(<span class="tk-str">'admin.'</span>)-><span class="tk-fn">group</span>(<span class="tk-kw">function</span> () {
+    <span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/dashboard'</span>, [<span class="tk-class">DashboardController</span>::<span class="tk-kw">class</span>, <span class="tk-str">'index'</span>])-><span class="tk-fn">name</span>(<span class="tk-str">'dashboard'</span>); <span class="tk-com">// admin.dashboard</span>
+});</code></pre>
+
+        <div class="code-label">Resource routes — generates all 7 RESTful routes at once</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">resource</span>(<span class="tk-str">'posts'</span>, <span class="tk-class">PostController</span>::<span class="tk-kw">class</span>);
+<span class="tk-com">// creates: index, create, store, show, edit, update, destroy</span>
+<span class="tk-class">Route</span>::<span class="tk-fn">apiResource</span>(<span class="tk-str">'posts'</span>, <span class="tk-class">PostController</span>::<span class="tk-kw">class</span>); <span class="tk-com">// excludes create & edit (no views needed for APIs)</span></code></pre>
+
+        <h3 class="sub-title">Route Model Binding</h3>
+        <p>Laravel automatically resolves Eloquent models from route parameters when the type-hint matches.</p>
+        <div class="code-label">Implicit binding (most common)</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/posts/{post}'</span>, <span class="tk-kw">function</span> (<span class="tk-class">Post</span> <span class="tk-var">$post</span>) {
+    <span class="tk-kw">return</span> <span class="tk-var">$post</span>->title; <span class="tk-com">// {post} auto-resolved to Post::findOrFail($id)</span>
+});
+<span class="tk-com">// bind by a different column:</span>
+<span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/posts/{post:slug}'</span>, ...); <span class="tk-com">// resolves via WHERE slug = ?</span></code></pre>
+
+        <h3 class="sub-title">Fallback routes &amp; rate limiting</h3>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">fallback</span>(<span class="tk-kw">function</span> () { <span class="tk-kw">return</span> <span class="tk-fn">response</span>()-><span class="tk-fn">view</span>(<span class="tk-str">'errors.404'</span>, [], <span class="tk-num">404</span>); });
+
+<span class="tk-class">Route</span>::<span class="tk-fn">middleware</span>(<span class="tk-str">'throttle:60,1'</span>)-><span class="tk-fn">group</span>(<span class="tk-kw">function</span> () { <span class="tk-com">// 60 requests / 1 min</span>
+    <span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/api/data'</span>, ...);
+});</code></pre>
+        <div class="version-note"><b>L11+:</b> Throttle now supports per-second limits, e.g. <code class="inline">throttle:10,1,1</code> style configs via <code class="inline">RateLimiter::for()</code> with <code class="inline">->by()</code> and per-second granularity in the limiter definitions.</div>
+
+        <h3 class="sub-title">Route caching (production)</h3>
+        <pre><code><span class="tk-kw">php</span> artisan route:cache   <span class="tk-com"># cache all routes for faster boot — closures NOT allowed in routes when cached</span>
+<span class="tk-kw">php</span> artisan route:clear</code></pre>
+        <div class="warn"><b>Important:</b> Routes using closures cannot be cached with <code class="inline">route:cache</code> — always use controller class array syntax for production routes.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="middleware">
+      <h2 class="concept-title">🧱 Middleware</h2>
+      <div class="concept-body">
+        <p>Middleware filters HTTP requests entering your app — authentication checks, logging, CORS, etc. Each middleware can inspect/modify the request, then pass it to the next layer, or short-circuit it.</p>
+
+        <div class="code-label">Creating middleware</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:middleware EnsureUserIsSubscribed</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">EnsureUserIsSubscribed</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">handle</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>, <span class="tk-class">Closure</span> <span class="tk-var">$next</span>): <span class="tk-class">Response</span>
+    {
+        <span class="tk-kw">if</span> (! <span class="tk-var">$request</span>->user()?->subscribed) {
+            <span class="tk-kw">return</span> <span class="tk-fn">redirect</span>(<span class="tk-str">'/billing'</span>);
+        }
+        <span class="tk-kw">return</span> <span class="tk-var">$next</span>(<span class="tk-var">$request</span>); <span class="tk-com">// pass along the pipeline</span>
+    }
+}</code></pre>
+
+        <div class="code-label">Registering middleware — Laravel 11+ (bootstrap/app.php)</div>
+        <pre><code><span class="tk-com">// bootstrap/app.php</span>
+-><span class="tk-fn">withMiddleware</span>(<span class="tk-kw">function</span> (<span class="tk-class">Middleware</span> <span class="tk-var">$middleware</span>) {
+    <span class="tk-var">$middleware</span>-><span class="tk-fn">alias</span>([<span class="tk-str">'subscribed'</span> => <span class="tk-class">EnsureUserIsSubscribed</span>::<span class="tk-kw">class</span>]);
+    <span class="tk-var">$middleware</span>-><span class="tk-fn">append</span>(<span class="tk-class">SomeGlobalMiddleware</span>::<span class="tk-kw">class</span>); <span class="tk-com">// global, runs on every request</span>
+})</code></pre>
+        <div class="version-note"><b>Laravel 8–10:</b> middleware was registered in <code class="inline">app/Http/Kernel.php</code> in the <code class="inline">$middleware</code>, <code class="inline">$middlewareGroups</code>, and <code class="inline">$routeMiddleware</code> arrays. Laravel 11 moved this into <code class="inline">bootstrap/app.php</code> via the fluent <code class="inline">withMiddleware()</code> closure, but Kernel.php-based registration still works if you have that file.</div>
+
+        <div class="code-label">Using it on a route + passing parameters</div>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/premium'</span>, ...)-><span class="tk-fn">middleware</span>(<span class="tk-str">'subscribed'</span>);
+<span class="tk-class">Route</span>::<span class="tk-fn">get</span>(<span class="tk-str">'/admin'</span>, ...)-><span class="tk-fn">middleware</span>(<span class="tk-str">'role:admin'</span>); <span class="tk-com">// param after the colon, read via $role in handle($request, $next, $role)</span></code></pre>
+
+        <h3 class="sub-title">Terminable middleware</h3>
+        <p>Runs <i>after</i> the response has been sent to the browser — useful for logging/cleanup that shouldn't delay the response.</p>
+        <pre><code><span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">terminate</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>, <span class="tk-class">Response</span> <span class="tk-var">$response</span>): <span class="tk-kw">void</span>
+{
+    <span class="tk-com">// e.g. write to an analytics log after response is flushed</span>
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="controllers">
+      <h2 class="concept-title">🎮 Controllers</h2>
+      <div class="concept-body">
+        <div class="code-label">Basic controller</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:controller PostController --resource</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostController</span> <span class="tk-kw">extends</span> <span class="tk-class">Controller</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">index</span>(): <span class="tk-class">View</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-fn">view</span>(<span class="tk-str">'posts.index'</span>, [<span class="tk-str">'posts'</span> => <span class="tk-class">Post</span>::<span class="tk-fn">latest</span>()-><span class="tk-fn">paginate</span>(<span class="tk-num">10</span>)]);
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">store</span>(<span class="tk-class">StorePostRequest</span> <span class="tk-var">$request</span>): <span class="tk-class">RedirectResponse</span>
+    {
+        <span class="tk-class">Post</span>::<span class="tk-fn">create</span>(<span class="tk-var">$request</span>->validated());
+        <span class="tk-kw">return</span> <span class="tk-fn">redirect</span>()-><span class="tk-fn">route</span>(<span class="tk-str">'posts.index'</span>);
+    }
+}</code></pre>
+
+        <h3 class="sub-title">Single Action Controllers</h3>
+        <p>When a controller does one job, skip the method name entirely with <code class="inline">__invoke</code>.</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:controller ProvisionServer --invokable</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">ProvisionServer</span> <span class="tk-kw">extends</span> <span class="tk-class">Controller</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__invoke</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>) { ... }
+}
+<span class="tk-com">// route:</span> <span class="tk-class">Route</span>::<span class="tk-fn">post</span>(<span class="tk-str">'/server'</span>, <span class="tk-class">ProvisionServer</span>::<span class="tk-kw">class</span>);</code></pre>
+
+        <h3 class="sub-title">API Resource Controllers</h3>
+        <pre><code><span class="tk-kw">php</span> artisan make:controller Api/PostController --api <span class="tk-com"># no create/edit methods</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="requests-responses">
+      <h2 class="concept-title">📨 Requests &amp; Responses</h2>
+      <div class="concept-body">
+        <h3 class="sub-title">Reading input</h3>
+        <pre><code><span class="tk-var">$request</span>->input(<span class="tk-str">'name'</span>);           <span class="tk-com">// single field, any method (GET/POST)</span>
+<span class="tk-var">$request</span>->input(<span class="tk-str">'name'</span>, <span class="tk-str">'default'</span>); <span class="tk-com">// with a default</span>
+<span class="tk-var">$request</span>->name;                  <span class="tk-com">// magic property access</span>
+<span class="tk-var">$request</span>->all();                  <span class="tk-com">// all input as array</span>
+<span class="tk-var">$request</span>->only([<span class="tk-str">'name'</span>, <span class="tk-str">'email'</span>]);
+<span class="tk-var">$request</span>->except([<span class="tk-str">'password'</span>]);
+<span class="tk-var">$request</span>->has(<span class="tk-str">'name'</span>);              <span class="tk-com">// bool, present (even if empty)</span>
+<span class="tk-var">$request</span>->filled(<span class="tk-str">'name'</span>);           <span class="tk-com">// bool, present AND not empty</span>
+<span class="tk-var">$request</span>->boolean(<span class="tk-str">'subscribe'</span>);     <span class="tk-com">// casts "1"/"true"/"on" -> true</span>
+<span class="tk-var">$request</span>->query(<span class="tk-str">'page'</span>);            <span class="tk-com">// query string only</span></code></pre>
+
+        <h3 class="sub-title">File uploads</h3>
+        <pre><code><span class="tk-kw">if</span> (<span class="tk-var">$request</span>->hasFile(<span class="tk-str">'avatar'</span>)) {
+    <span class="tk-var">$path</span> = <span class="tk-var">$request</span>->file(<span class="tk-str">'avatar'</span>)->store(<span class="tk-str">'avatars'</span>, <span class="tk-str">'public'</span>);
+    <span class="tk-com">// or with a custom name:</span>
+    <span class="tk-var">$path</span> = <span class="tk-var">$request</span>->file(<span class="tk-str">'avatar'</span>)->storeAs(<span class="tk-str">'avatars'</span>, <span class="tk-var">$request</span>->user()->id.<span class="tk-str">'.jpg'</span>, <span class="tk-str">'public'</span>);
+}</code></pre>
+
+        <h3 class="sub-title">Responses</h3>
+        <pre><code><span class="tk-kw">return</span> <span class="tk-fn">response</span>(<span class="tk-str">'Hello World'</span>, <span class="tk-num">200</span>);
+<span class="tk-kw">return</span> <span class="tk-fn">response</span>()->json([<span class="tk-str">'status'</span> => <span class="tk-str">'ok'</span>], <span class="tk-num">200</span>);
+<span class="tk-kw">return</span> <span class="tk-fn">response</span>()->download(<span class="tk-var">$pathToFile</span>);
+<span class="tk-kw">return</span> <span class="tk-fn">redirect</span>()->route(<span class="tk-str">'home'</span>)->with(<span class="tk-str">'success'</span>, <span class="tk-str">'Saved!'</span>); <span class="tk-com">// flash message</span>
+<span class="tk-kw">return</span> <span class="tk-fn">back</span>()->withErrors([<span class="tk-str">'email'</span> => <span class="tk-str">'Already taken.'</span>]);</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="blade">
+      <h2 class="concept-title">🔵 Blade Templating</h2>
+      <div class="concept-body">
+        <h3 class="sub-title">Echoing &amp; control structures</h3>
+        <pre><code>{{ <span class="tk-var">$user</span>->name }}              <span class="tk-com">{{-- auto-escaped --}}</span>
+{!! <span class="tk-var">$rawHtml</span> !!}              <span class="tk-com">{{-- raw, unescaped --}}</span>
+
+@if (<span class="tk-var">$user</span>->isAdmin())
+    Admin
+@elseif (<span class="tk-var">$user</span>->isEditor())
+    Editor
+@else
+    Viewer
+@endif
+
+@foreach (<span class="tk-var">$posts</span> <span class="tk-kw">as</span> <span class="tk-var">$post</span>)
+    {{ <span class="tk-var">$post</span>->title }}
+@endforeach
+
+@forelse (<span class="tk-var">$posts</span> <span class="tk-kw">as</span> <span class="tk-var">$post</span>)
+    {{ <span class="tk-var">$post</span>->title }}
+@empty
+    No posts found.
+@endforelse</code></pre>
+
+        <h3 class="sub-title">Layouts: @extends / @section vs Components</h3>
+        <pre><code><span class="tk-com">{{-- resources/views/layouts/app.blade.php --}}</span>
+&lt;html&gt;
+&lt;body&gt;
+    @yield(<span class="tk-str">'content'</span>)
+&lt;/body&gt;
+&lt;/html&gt;
+
+<span class="tk-com">{{-- resources/views/posts/index.blade.php --}}</span>
+@extends(<span class="tk-str">'layouts.app'</span>)
+@section(<span class="tk-str">'content'</span>)
+    &lt;h1&gt;Posts&lt;/h1&gt;
+@endsection</code></pre>
+
+        <h3 class="sub-title">Blade Components (modern approach, preferred since L7+)</h3>
+        <pre><code><span class="tk-kw">php</span> artisan make:component Alert</code></pre>
+        <pre><code><span class="tk-com">{{-- resources/views/components/alert.blade.php --}}</span>
+&lt;div class=<span class="tk-str">"alert alert-{{ $type }}"</span>&gt;
+    {{ <span class="tk-var">$slot</span> }}
+&lt;/div&gt;
+
+<span class="tk-com">{{-- usage anywhere --}}</span>
+&lt;x-alert type=<span class="tk-str">"danger"</span>&gt;Something went wrong.&lt;/x-alert&gt;</code></pre>
+
+        <h3 class="sub-title">Named slots</h3>
+        <pre><code><span class="tk-com">{{-- card.blade.php --}}</span>
+&lt;div class=<span class="tk-str">"card"</span>&gt;
+    &lt;div class=<span class="tk-str">"card-header"</span>&gt;{{ <span class="tk-var">$header</span> }}&lt;/div&gt;
+    &lt;div class=<span class="tk-str">"card-body"</span>&gt;{{ <span class="tk-var">$slot</span> }}&lt;/div&gt;
+&lt;/div&gt;
+
+&lt;x-card&gt;
+    &lt;x-slot:header&gt;Title here&lt;/x-slot:header&gt;
+    Body content here.
+&lt;/x-card&gt;</code></pre>
+
+        <h3 class="sub-title">@include, @stack/@push, custom directives</h3>
+        <pre><code>@include(<span class="tk-str">'partials.nav'</span>, [<span class="tk-str">'active'</span> => <span class="tk-str">'home'</span>])
+
+<span class="tk-com">{{-- layout file --}}</span>
+@stack(<span class="tk-str">'scripts'</span>)
+
+<span class="tk-com">{{-- any child view --}}</span>
+@push(<span class="tk-str">'scripts'</span>)
+    &lt;script src=<span class="tk-str">"chart.js"</span>&gt;&lt;/script&gt;
+@endpush</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="validation">
+      <h2 class="concept-title">✅ Validation</h2>
+      <div class="concept-body">
+        <p>Validation can be done inline in the controller, but <b>Form Request</b> classes are the standard for anything beyond trivial — they keep controllers clean and centralize authorization + rules.</p>
+
+        <div class="code-label">Form Request</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:request StorePostRequest</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">StorePostRequest</span> <span class="tk-kw">extends</span> <span class="tk-class">FormRequest</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">authorize</span>(): <span class="tk-kw">bool</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-kw">true</span>; <span class="tk-com">// or a Gate/Policy check</span>
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">rules</span>(): <span class="tk-kw">array</span>
+    {
+        <span class="tk-kw">return</span> [
+            <span class="tk-str">'title'</span> => <span class="tk-str">'required|string|max:255'</span>,
+            <span class="tk-str">'email'</span> => <span class="tk-str">'required|email|unique:users,email'</span>,
+            <span class="tk-str">'category_id'</span> => <span class="tk-str">'required|exists:categories,id'</span>,
+            <span class="tk-str">'tags'</span> => <span class="tk-str">'array'</span>,
+            <span class="tk-str">'tags.*'</span> => <span class="tk-str">'string|distinct'</span>,
+        ];
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">messages</span>(): <span class="tk-kw">array</span>
+    {
+        <span class="tk-kw">return</span> [<span class="tk-str">'title.required'</span> => <span class="tk-str">'A title is required.'</span>];
+    }
+}
+
+<span class="tk-com">// controller — just type-hint it, validation runs automatically:</span>
+<span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">store</span>(<span class="tk-class">StorePostRequest</span> <span class="tk-var">$request</span>) {
+    <span class="tk-var">$validated</span> = <span class="tk-var">$request</span>->validated();
+}</code></pre>
+
+        <h3 class="sub-title">Common validation rules</h3>
+        <table class="ref-table">
+          <tr><th>Rule</th><th>What it checks</th></tr>
+          <tr><td><code class="inline">required</code></td><td>Field must be present and not empty</td></tr>
+          <tr><td><code class="inline">nullable</code></td><td>Allows null without failing other rules</td></tr>
+          <tr><td><code class="inline">string / integer / numeric / boolean / array</code></td><td>Type checks</td></tr>
+          <tr><td><code class="inline">email</code></td><td>Valid email format</td></tr>
+          <tr><td><code class="inline">unique:table,column</code></td><td>No existing row with this value</td></tr>
+          <tr><td><code class="inline">exists:table,column</code></td><td>Value must exist in another table (FK validity)</td></tr>
+          <tr><td><code class="inline">min:x / max:x</code></td><td>Length (string) or value (number) bounds</td></tr>
+          <tr><td><code class="inline">confirmed</code></td><td>Requires matching <code class="inline">{field}_confirmation</code> input</td></tr>
+          <tr><td><code class="inline">date / date_format:Y-m-d</code></td><td>Valid date / specific format</td></tr>
+          <tr><td><code class="inline">in:a,b,c</code></td><td>Value must be one of the list</td></tr>
+          <tr><td><code class="inline">file / image / mimes:jpg,png</code></td><td>Upload type checks</td></tr>
+          <tr><td><code class="inline">regex:pattern</code></td><td>Custom regex match</td></tr>
+        </table>
+
+        <h3 class="sub-title">Custom rule classes</h3>
+        <pre><code><span class="tk-kw">php</span> artisan make:rule Uppercase</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">Uppercase</span> <span class="tk-kw">implements</span> <span class="tk-class">ValidationRule</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">validate</span>(<span class="tk-kw">string</span> <span class="tk-var">$attribute</span>, <span class="tk-kw">mixed</span> <span class="tk-var">$value</span>, <span class="tk-class">Closure</span> <span class="tk-var">$fail</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-kw">if</span> (<span class="tk-var">$value</span> !== <span class="tk-fn">strtoupper</span>(<span class="tk-var">$value</span>)) {
+            <span class="tk-var">$fail</span>(<span class="tk-str">'The :attribute must be uppercase.'</span>);
+        }
+    }
+}
+<span class="tk-com">// rules(): ['code' => ['required', new Uppercase]]</span></code></pre>
+
+        <h3 class="sub-title">Conditional rules</h3>
+        <pre><code><span class="tk-class">Validator</span>::<span class="tk-fn">make</span>(<span class="tk-var">$data</span>, <span class="tk-var">$rules</span>)-><span class="tk-fn">sometimes</span>(<span class="tk-str">'reason'</span>, <span class="tk-str">'required'</span>, <span class="tk-kw">function</span> (<span class="tk-var">$input</span>) {
+    <span class="tk-kw">return</span> <span class="tk-var">$input</span>->status === <span class="tk-str">'rejected'</span>;
+});</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 2: DATABASE & ELOQUENT -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-2">
+      <span class="part-tag p2">Part 2</span>
+      <h2 class="part-title">Database &amp; Eloquent</h2>
+      <p class="part-desc">Migrations, the query builder, every Eloquent relationship type, eager loading, collections, casts, scopes, model events, pagination, and large-dataset handling.</p>
+    </div>
+
+    <section class="concept" id="migrations">
+      <h2 class="concept-title">🧩 Migrations</h2>
+      <div class="concept-body">
+        <p>Migrations are version control for your database schema — every change is a PHP file that can be run forward (<code class="inline">up</code>) or reversed (<code class="inline">down</code>).</p>
+        <div class="code-label">Create a migration</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:migration create_posts_table</code></pre>
+        <pre><code><span class="tk-kw">return</span> <span class="tk-kw">new</span> <span class="tk-kw">class</span> <span class="tk-kw">extends</span> <span class="tk-class">Migration</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">up</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">Schema</span>::<span class="tk-fn">create</span>(<span class="tk-str">'posts'</span>, <span class="tk-kw">function</span> (<span class="tk-class">Blueprint</span> <span class="tk-var">$table</span>) {
+            <span class="tk-var">$table</span>->id();
+            <span class="tk-var">$table</span>->foreignId(<span class="tk-str">'user_id'</span>)->constrained()->cascadeOnDelete();
+            <span class="tk-var">$table</span>->string(<span class="tk-str">'title'</span>);
+            <span class="tk-var">$table</span>->string(<span class="tk-str">'slug'</span>)->unique();
+            <span class="tk-var">$table</span>->text(<span class="tk-str">'body'</span>);
+            <span class="tk-var">$table</span>->boolean(<span class="tk-str">'published'</span>)->default(<span class="tk-kw">false</span>);
+            <span class="tk-var">$table</span>->unsignedInteger(<span class="tk-str">'views'</span>)->default(<span class="tk-num">0</span>);
+            <span class="tk-var">$table</span>->timestamp(<span class="tk-str">'published_at'</span>)->nullable();
+            <span class="tk-var">$table</span>->softDeletes(); <span class="tk-com">// adds nullable deleted_at</span>
+            <span class="tk-var">$table</span>->timestamps(); <span class="tk-com">// created_at + updated_at</span>
+
+            <span class="tk-var">$table</span>->index(<span class="tk-str">'slug'</span>);
+            <span class="tk-var">$table</span>->index([<span class="tk-str">'user_id'</span>, <span class="tk-str">'published'</span>]); <span class="tk-com">// composite index</span>
+        });
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">down</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">Schema</span>::<span class="tk-fn">dropIfExists</span>(<span class="tk-str">'posts'</span>);
+    }
+};</code></pre>
+
+        <h3 class="sub-title">Common column types</h3>
+        <table class="ref-table">
+          <tr><th>Method</th><th>Produces</th></tr>
+          <tr><td><code class="inline">id() / bigIncrements('id')</code></td><td>Auto-incrementing primary key (BIGINT)</td></tr>
+          <tr><td><code class="inline">string('name', 100)</code></td><td>VARCHAR, default length 255</td></tr>
+          <tr><td><code class="inline">text() / longText()</code></td><td>TEXT / LONGTEXT</td></tr>
+          <tr><td><code class="inline">integer() / bigInteger() / unsignedInteger()</code></td><td>Numeric types</td></tr>
+          <tr><td><code class="inline">decimal('price', 8, 2)</code></td><td>Fixed-precision decimal</td></tr>
+          <tr><td><code class="inline">boolean()</code></td><td>TINYINT(1)</td></tr>
+          <tr><td><code class="inline">date() / dateTime() / timestamp()</code></td><td>Date/time columns</td></tr>
+          <tr><td><code class="inline">json()</code></td><td>JSON column (cast to array/object in model)</td></tr>
+          <tr><td><code class="inline">enum('status', ['draft','live'])</code></td><td>ENUM column</td></tr>
+          <tr><td><code class="inline">foreignId('user_id')->constrained()</code></td><td>FK column + constraint in one call</td></tr>
+          <tr><td><code class="inline">uuid() / ulid()</code></td><td>UUID/ULID columns (for non-integer PKs)</td></tr>
+          <tr><td><code class="inline">morphs('taggable')</code></td><td>Adds <code class="inline">taggable_id</code> + <code class="inline">taggable_type</code> for polymorphic relations</td></tr>
+        </table>
+
+        <h3 class="sub-title">Modifying existing tables</h3>
+        <pre><code><span class="tk-class">Schema</span>::<span class="tk-fn">table</span>(<span class="tk-str">'posts'</span>, <span class="tk-kw">function</span> (<span class="tk-class">Blueprint</span> <span class="tk-var">$table</span>) {
+    <span class="tk-var">$table</span>->string(<span class="tk-str">'subtitle'</span>)->nullable()->after(<span class="tk-str">'title'</span>);
+    <span class="tk-var">$table</span>->dropColumn(<span class="tk-str">'old_column'</span>);
+    <span class="tk-var">$table</span>->renameColumn(<span class="tk-str">'body'</span>, <span class="tk-str">'content'</span>);
+});
+<span class="tk-com">// requires: composer require doctrine/dbal  (for column modification on older Laravel; not needed L11+ in most cases)</span></code></pre>
+
+        <div class="code-label">Running migrations</div>
+        <pre><code><span class="tk-kw">php</span> artisan migrate
+<span class="tk-kw">php</span> artisan migrate:rollback        <span class="tk-com"># undo last batch</span>
+<span class="tk-kw">php</span> artisan migrate:fresh --seed     <span class="tk-com"># drop everything, re-migrate, re-seed</span>
+<span class="tk-kw">php</span> artisan migrate:status          <span class="tk-com"># see what's been run</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="seeders-factories">
+      <h2 class="concept-title">🌱 Seeders &amp; Factories</h2>
+      <div class="concept-body">
+        <div class="code-label">Factory — generates fake model data</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:factory PostFactory</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostFactory</span> <span class="tk-kw">extends</span> <span class="tk-class">Factory</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">definition</span>(): <span class="tk-kw">array</span>
+    {
+        <span class="tk-kw">return</span> [
+            <span class="tk-str">'user_id'</span> => <span class="tk-class">User</span>::<span class="tk-fn">factory</span>(), <span class="tk-com">// creates a related user automatically</span>
+            <span class="tk-str">'title'</span> => <span class="tk-fn">fake</span>()->sentence(),
+            <span class="tk-str">'slug'</span> => <span class="tk-fn">fake</span>()->unique()->slug(),
+            <span class="tk-str">'body'</span> => <span class="tk-fn">fake</span>()->paragraphs(<span class="tk-num">3</span>, <span class="tk-kw">true</span>),
+            <span class="tk-str">'published'</span> => <span class="tk-fn">fake</span>()->boolean(<span class="tk-num">80</span>),
+        ];
+    }
+
+    <span class="tk-com">// state — a named variation of the factory</span>
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">unpublished</span>(): <span class="tk-class">static</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-var">$this</span>->state(<span class="tk-fn">fn</span> (<span class="tk-kw">array</span> <span class="tk-var">$attrs</span>) => [<span class="tk-str">'published'</span> => <span class="tk-kw">false</span>]);
+    }
+}
+
+<span class="tk-com">// usage:</span>
+<span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->count(<span class="tk-num">10</span>)->create();
+<span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->unpublished()->create();
+<span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->for(<span class="tk-var">$existingUser</span>)->create(); <span class="tk-com">// attach to a specific user</span></code></pre>
+
+        <div class="code-label">Seeder</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:seeder PostSeeder</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">DatabaseSeeder</span> <span class="tk-kw">extends</span> <span class="tk-class">Seeder</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">run</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$this</span>->call([<span class="tk-class">UserSeeder</span>::<span class="tk-kw">class</span>, <span class="tk-class">PostSeeder</span>::<span class="tk-kw">class</span>]);
+    }
+}
+<span class="tk-com">// php artisan db:seed</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="query-builder">
+      <h2 class="concept-title">🔍 Query Builder</h2>
+      <div class="concept-body">
+        <p>The query builder (<code class="inline">DB::table()</code>) gives a fluent, database-agnostic interface for raw queries — useful when you don't need a full Eloquent model.</p>
+        <pre><code><span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'users'</span>)->where(<span class="tk-str">'active'</span>, <span class="tk-kw">true</span>)->get();
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'users'</span>)->where(<span class="tk-str">'votes'</span>, <span class="tk-str">'>'</span>, <span class="tk-num">100</span>)->orWhere(<span class="tk-str">'name'</span>, <span class="tk-str">'John'</span>)->get();
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'users'</span>)->whereIn(<span class="tk-str">'id'</span>, [<span class="tk-num">1</span>,<span class="tk-num">2</span>,<span class="tk-num">3</span>])->get();
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'users'</span>)->whereBetween(<span class="tk-str">'age'</span>, [<span class="tk-num">18</span>, <span class="tk-num">30</span>])->get();
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'users'</span>)->whereNull(<span class="tk-str">'deleted_at'</span>)->get();
+
+<span class="tk-com">// joins</span>
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'posts'</span>)
+    ->join(<span class="tk-str">'users'</span>, <span class="tk-str">'users.id'</span>, <span class="tk-str">'='</span>, <span class="tk-str">'posts.user_id'</span>)
+    ->select(<span class="tk-str">'posts.*'</span>, <span class="tk-str">'users.name as author'</span>)
+    ->get();
+
+<span class="tk-com">// unions</span>
+<span class="tk-var">$first</span> = <span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'archived_posts'</span>);
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'posts'</span>)->union(<span class="tk-var">$first</span>)->get();
+
+<span class="tk-com">// raw expressions when the query builder can't express something</span>
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'orders'</span>)->select(<span class="tk-class">DB</span>::<span class="tk-fn">raw</span>(<span class="tk-str">'COUNT(*) as order_count, status'</span>))->groupBy(<span class="tk-str">'status'</span>)->get();
+
+<span class="tk-com">// aggregates</span>
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'orders'</span>)->count();
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'orders'</span>)->sum(<span class="tk-str">'total'</span>);
+<span class="tk-class">DB</span>::<span class="tk-fn">table</span>(<span class="tk-str">'orders'</span>)->avg(<span class="tk-str">'total'</span>);</code></pre>
+        <div class="warn"><b>Security:</b> Always pass values as bindings (as shown above) rather than concatenating into <code class="inline">DB::raw()</code> strings — string concatenation in raw queries is the #1 source of SQL injection in Laravel apps.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="eloquent-basics">
+      <h2 class="concept-title">🗂️ Eloquent Basics</h2>
+      <div class="concept-body">
+        <pre><code><span class="tk-kw">php</span> artisan make:model Post -m  <span class="tk-com"># -m also creates the migration</span></code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span>
+{
+    <span class="tk-kw">use</span> <span class="tk-class">HasFactory</span>, <span class="tk-class">SoftDeletes</span>;
+
+    <span class="tk-kw">protected</span> <span class="tk-var">$fillable</span> = [<span class="tk-str">'title'</span>, <span class="tk-str">'slug'</span>, <span class="tk-str">'body'</span>, <span class="tk-str">'published'</span>]; <span class="tk-com">// mass-assignable</span>
+    <span class="tk-com">// or, the inverse — block specific fields:</span>
+    <span class="tk-kw">protected</span> <span class="tk-var">$guarded</span> = [<span class="tk-str">'id'</span>];
+}</code></pre>
+        <h3 class="sub-title">Mass assignment</h3>
+        <p>Eloquent blocks mass assignment by default to prevent attackers injecting unexpected fields (e.g. <code class="inline">is_admin</code>) via form input. Use <code class="inline">$fillable</code> (allow-list) or <code class="inline">$guarded</code> (block-list) to control it.</p>
+        <pre><code><span class="tk-class">Post</span>::<span class="tk-fn">create</span>([<span class="tk-str">'title'</span> => <span class="tk-str">'Hello'</span>, <span class="tk-str">'body'</span> => <span class="tk-str">'World'</span>]); <span class="tk-com">// only $fillable fields apply</span></code></pre>
+
+        <h3 class="sub-title">Timestamps &amp; Soft Deletes</h3>
+        <pre><code><span class="tk-com">// disable auto timestamps if the table doesn't have them:</span>
+<span class="tk-kw">public</span> <span class="tk-var">$timestamps</span> = <span class="tk-kw">false</span>;
+
+<span class="tk-com">// soft deletes — row stays in DB, deleted_at is set instead of removed</span>
+<span class="tk-var">$post</span>->delete();              <span class="tk-com">// sets deleted_at</span>
+<span class="tk-class">Post</span>::<span class="tk-fn">withTrashed</span>()->get();  <span class="tk-com">// include soft-deleted rows</span>
+<span class="tk-class">Post</span>::<span class="tk-fn">onlyTrashed</span>()->get();   <span class="tk-com">// only soft-deleted rows</span>
+<span class="tk-var">$post</span>->restore();             <span class="tk-com">// undelete</span>
+<span class="tk-var">$post</span>->forceDelete();         <span class="tk-com">// permanently remove</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="relationships">
+      <h2 class="concept-title">🔗 Eloquent Relationships</h2>
+      <div class="concept-body">
+        <p>Every relationship type you'll need in a real app, with the migration shape implied by each.</p>
+
+        <h3 class="sub-title">One to One — hasOne / belongsTo</h3>
+        <pre><code><span class="tk-com">// User has one Phone. phones table has user_id.</span>
+<span class="tk-kw">class</span> <span class="tk-class">User</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">phone</span>(): <span class="tk-class">HasOne</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->hasOne(<span class="tk-class">Phone</span>::<span class="tk-kw">class</span>); }
+}
+<span class="tk-kw">class</span> <span class="tk-class">Phone</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">user</span>(): <span class="tk-class">BelongsTo</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->belongsTo(<span class="tk-class">User</span>::<span class="tk-kw">class</span>); }
+}
+<span class="tk-com">// usage:</span> <span class="tk-var">$user</span>->phone->number;  <span class="tk-var">$phone</span>->user->name;</code></pre>
+
+        <h3 class="sub-title">One to Many — hasMany / belongsTo</h3>
+        <pre><code><span class="tk-com">// User has many Posts. posts table has user_id.</span>
+<span class="tk-kw">class</span> <span class="tk-class">User</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">posts</span>(): <span class="tk-class">HasMany</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->hasMany(<span class="tk-class">Post</span>::<span class="tk-kw">class</span>); }
+}
+<span class="tk-com">// usage:</span> <span class="tk-var">$user</span>->posts; <span class="tk-com">// Collection of Post</span>
+<span class="tk-var">$user</span>->posts()->where(<span class="tk-str">'published'</span>, <span class="tk-kw">true</span>)->get(); <span class="tk-com">// query further before executing</span></code></pre>
+
+        <h3 class="sub-title">Many to Many — belongsToMany</h3>
+        <pre><code><span class="tk-com">// Post belongs to many Tags, and vice versa. Needs a pivot table: post_tag (post_id, tag_id).</span>
+<span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">tags</span>(): <span class="tk-class">BelongsToMany</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->belongsToMany(<span class="tk-class">Tag</span>::<span class="tk-kw">class</span>); }
+}
+<span class="tk-com">// attaching / detaching / syncing the pivot:</span>
+<span class="tk-var">$post</span>->tags()->attach(<span class="tk-var">$tagId</span>);
+<span class="tk-var">$post</span>->tags()->detach(<span class="tk-var">$tagId</span>);
+<span class="tk-var">$post</span>->tags()->sync([<span class="tk-num">1</span>, <span class="tk-num">2</span>, <span class="tk-num">3</span>]); <span class="tk-com">// replaces all pivot rows with exactly these</span>
+
+<span class="tk-com">// pivot table with extra columns:</span>
+<span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">tags</span>(): <span class="tk-class">BelongsToMany</span>
+{
+    <span class="tk-kw">return</span> <span class="tk-var">$this</span>->belongsToMany(<span class="tk-class">Tag</span>::<span class="tk-kw">class</span>)->withPivot(<span class="tk-str">'added_by'</span>)->withTimestamps();
+}</code></pre>
+
+        <h3 class="sub-title">Has Many Through</h3>
+        <pre><code><span class="tk-com">// Mechanic -> Car -> Owner. Mechanic can reach Owner through Car.</span>
+<span class="tk-kw">class</span> <span class="tk-class">Mechanic</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">carOwners</span>(): <span class="tk-class">HasManyThrough</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-var">$this</span>->hasManyThrough(<span class="tk-class">Owner</span>::<span class="tk-kw">class</span>, <span class="tk-class">Car</span>::<span class="tk-kw">class</span>);
+    }
+}</code></pre>
+
+        <h3 class="sub-title">Polymorphic Relations</h3>
+        <p>Lets a model belong to more than one other model type using a single relation — e.g. <code class="inline">Comment</code> can belong to either a <code class="inline">Post</code> or a <code class="inline">Video</code>.</p>
+        <pre><code><span class="tk-com">// comments table: commentable_id, commentable_type (added via $table->morphs('commentable'))</span>
+<span class="tk-kw">class</span> <span class="tk-class">Comment</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">commentable</span>(): <span class="tk-class">MorphTo</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->morphTo(); }
+}
+<span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">comments</span>(): <span class="tk-class">MorphMany</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->morphMany(<span class="tk-class">Comment</span>::<span class="tk-kw">class</span>, <span class="tk-str">'commentable'</span>); }
+}
+<span class="tk-com">// usage is identical to a normal relation:</span>
+<span class="tk-var">$post</span>->comments;  <span class="tk-var">$comment</span>->commentable; <span class="tk-com">// returns the Post or Video instance</span></code></pre>
+
+        <h3 class="sub-title">Many-to-Many Polymorphic</h3>
+        <pre><code><span class="tk-com">// Post and Video can both have many Tags, Tags can belong to many of both.</span>
+<span class="tk-kw">class</span> <span class="tk-class">Tag</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">posts</span>(): <span class="tk-class">MorphToMany</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->morphedByMany(<span class="tk-class">Post</span>::<span class="tk-kw">class</span>, <span class="tk-str">'taggable'</span>); }
+}
+<span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">tags</span>(): <span class="tk-class">MorphToMany</span> { <span class="tk-kw">return</span> <span class="tk-var">$this</span>->morphToMany(<span class="tk-class">Tag</span>::<span class="tk-kw">class</span>, <span class="tk-str">'taggable'</span>); }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="eager-loading">
+      <h2 class="concept-title">⚡ Eager Loading &amp; the N+1 Problem</h2>
+      <div class="concept-body">
+        <p>Accessing a relationship inside a loop (<code class="inline">$user->posts</code> for every user) fires one query per row — the classic <b>N+1 problem</b>. Eager loading fetches all related rows in a second query up front.</p>
+        <div class="code-label">The problem</div>
+        <pre><code><span class="tk-var">$users</span> = <span class="tk-class">User</span>::<span class="tk-fn">all</span>(); <span class="tk-com">// 1 query</span>
+<span class="tk-kw">foreach</span> (<span class="tk-var">$users</span> <span class="tk-kw">as</span> <span class="tk-var">$user</span>) {
+    <span class="tk-fn">echo</span> <span class="tk-var">$user</span>->posts->count(); <span class="tk-com">// +1 query PER user — N+1!</span>
+}</code></pre>
+        <div class="code-label">The fix — with()</div>
+        <pre><code><span class="tk-var">$users</span> = <span class="tk-class">User</span>::<span class="tk-fn">with</span>(<span class="tk-str">'posts'</span>)->get(); <span class="tk-com">// 2 queries total, regardless of row count</span>
+<span class="tk-kw">foreach</span> (<span class="tk-var">$users</span> <span class="tk-kw">as</span> <span class="tk-var">$user</span>) {
+    <span class="tk-fn">echo</span> <span class="tk-var">$user</span>->posts->count(); <span class="tk-com">// no extra query — already loaded</span>
+}
+
+<span class="tk-com">// nested eager loading:</span>
+<span class="tk-class">User</span>::<span class="tk-fn">with</span>(<span class="tk-str">'posts.comments'</span>)->get();
+<span class="tk-com">// multiple relations:</span>
+<span class="tk-class">User</span>::<span class="tk-fn">with</span>([<span class="tk-str">'posts'</span>, <span class="tk-str">'profile'</span>])->get();
+<span class="tk-com">// constrained eager loading — only published posts:</span>
+<span class="tk-class">User</span>::<span class="tk-fn">with</span>([<span class="tk-str">'posts'</span> => <span class="tk-kw">fn</span> (<span class="tk-var">$q</span>) => <span class="tk-var">$q</span>->where(<span class="tk-str">'published'</span>, <span class="tk-kw">true</span>)])->get();</code></pre>
+
+        <div class="code-label">withCount / withSum / withAvg — aggregate without loading the rows</div>
+        <pre><code><span class="tk-var">$users</span> = <span class="tk-class">User</span>::<span class="tk-fn">withCount</span>(<span class="tk-str">'posts'</span>)->get(); <span class="tk-com">// adds $user->posts_count, no rows loaded</span>
+<span class="tk-class">User</span>::<span class="tk-fn">withSum</span>(<span class="tk-str">'orders'</span>, <span class="tk-str">'total'</span>)->get();   <span class="tk-com">// $user->orders_sum_total</span>
+<span class="tk-class">User</span>::<span class="tk-fn">withAvg</span>(<span class="tk-str">'reviews'</span>, <span class="tk-str">'rating'</span>)->get();</code></pre>
+
+        <div class="code-label">Lazy eager loading — load() on an already-fetched collection</div>
+        <pre><code><span class="tk-var">$users</span> = <span class="tk-class">User</span>::<span class="tk-fn">all</span>();
+<span class="tk-kw">if</span> (<span class="tk-var">$needsPosts</span>) {
+    <span class="tk-var">$users</span>->load(<span class="tk-str">'posts'</span>); <span class="tk-com">// load relation after the fact, still avoids N+1</span>
+}</code></pre>
+
+        <div class="tip"><b>Tip:</b> In local/dev, install <b>Laravel Debugbar</b> or use <code class="inline">DB::listen()</code> to spot N+1 queries before they reach production.</div>
+        <div class="version-note"><b>All versions:</b> You can force Laravel to throw an exception when lazy loading happens accidentally by calling <code class="inline">Model::preventLazyLoading()</code> in a service provider's <code class="inline">boot()</code> method (typically wrapped in <code class="inline">!app()->isProduction()</code>) — great for catching N+1s in development.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="collections">
+      <h2 class="concept-title">📦 Collections</h2>
+      <div class="concept-body">
+        <p>Every Eloquent query that returns multiple rows gives you a <code class="inline">Collection</code> — a powerful wrapper around arrays with dozens of chainable methods. <code class="inline">map()</code> is generally preferred over <code class="inline">foreach</code> for transforming data: it's chainable, returns a new collection, and doesn't require manual array building.</p>
+
+        <table class="ref-table">
+          <tr><th>Method</th><th>What it does</th><th>Example</th></tr>
+          <tr><td><code class="inline">map()</code></td><td>Transform each item, return new collection</td><td><code class="inline">$users->map(fn($u) => $u->name)</code></td></tr>
+          <tr><td><code class="inline">filter()</code></td><td>Keep items matching a condition</td><td><code class="inline">$users->filter(fn($u) => $u->active)</code></td></tr>
+          <tr><td><code class="inline">reject()</code></td><td>Opposite of filter — remove matches</td><td><code class="inline">$users->reject(fn($u) => $u->banned)</code></td></tr>
+          <tr><td><code class="inline">reduce()</code></td><td>Collapse to a single value</td><td><code class="inline">$cart->reduce(fn($c,$i)=>$c+$i->price, 0)</code></td></tr>
+          <tr><td><code class="inline">flatMap()</code></td><td>Map then flatten one level</td><td><code class="inline">$orders->flatMap(fn($o)=>$o->items)</code></td></tr>
+          <tr><td><code class="inline">groupBy()</code></td><td>Group items by a key/callback</td><td><code class="inline">$users->groupBy('country')</code></td></tr>
+          <tr><td><code class="inline">sortBy() / sortByDesc()</code></td><td>Sort by key/callback</td><td><code class="inline">$users->sortBy('name')</code></td></tr>
+          <tr><td><code class="inline">unique()</code></td><td>Remove duplicates (by key, optionally)</td><td><code class="inline">$users->unique('email')</code></td></tr>
+          <tr><td><code class="inline">pluck()</code></td><td>Extract one column as a flat list</td><td><code class="inline">$users->pluck('email')</code></td></tr>
+          <tr><td><code class="inline">each()</code></td><td>Side-effect iteration (no return value)</td><td><code class="inline">$users->each(fn($u)=>$u->ping())</code></td></tr>
+          <tr><td><code class="inline">partition()</code></td><td>Split into two collections by condition</td><td><code class="inline">[$paid,$unpaid]=$orders->partition(fn($o)=>$o->paid)</code></td></tr>
+          <tr><td><code class="inline">contains() / firstWhere()</code></td><td>Search</td><td><code class="inline">$users->firstWhere('id', 5)</code></td></tr>
+          <tr><td><code class="inline">chunk()</code></td><td>Split into smaller collections</td><td><code class="inline">$users->chunk(100)</code></td></tr>
+        </table>
+
+        <div class="code-label">map() vs foreach — the classic controller upgrade</div>
+        <pre><code><span class="tk-com">// foreach: more lines, manual array building, doesn't chain</span>
+<span class="tk-var">$usersData</span> = [];
+<span class="tk-kw">foreach</span> (<span class="tk-var">$users</span> <span class="tk-kw">as</span> <span class="tk-var">$user</span>) {
+    <span class="tk-var">$usersData</span>[] = [<span class="tk-str">'id'</span> => <span class="tk-var">$user</span>->id, <span class="tk-str">'name'</span> => <span class="tk-var">$user</span>->name];
+}
+
+<span class="tk-com">// map(): one expression, returns a new Collection, chainable</span>
+<span class="tk-var">$usersData</span> = <span class="tk-var">$users</span>->map(<span class="tk-kw">fn</span> (<span class="tk-var">$user</span>) => [<span class="tk-str">'id'</span> => <span class="tk-var">$user</span>->id, <span class="tk-str">'name'</span> => <span class="tk-var">$user</span>->name]);
+<span class="tk-com">// chain freely:</span>
+<span class="tk-class">User</span>::<span class="tk-fn">query</span>()->active()->with(<span class="tk-str">'profile'</span>)->get()->map(...)->sortBy(<span class="tk-str">'name'</span>)->values();</code></pre>
+
+        <h3 class="sub-title">LazyCollection — for huge datasets</h3>
+        <p>Behaves like a Collection but only loads one item into memory at a time using PHP generators. See <a href="#large-datasets">Large Dataset Handling</a> below.</p>
+
+        <h3 class="sub-title">Custom collection macros</h3>
+        <pre><code><span class="tk-com">// in a service provider's boot():</span>
+<span class="tk-class">Collection</span>::<span class="tk-fn">macro</span>(<span class="tk-str">'toUpper'</span>, <span class="tk-kw">function</span> () {
+    <span class="tk-kw">return</span> <span class="tk-var">$this</span>->map(<span class="tk-kw">fn</span> (<span class="tk-var">$v</span>) => <span class="tk-fn">strtoupper</span>(<span class="tk-var">$v</span>));
+});
+<span class="tk-com">// usage anywhere:</span> <span class="tk-fn">collect</span>([<span class="tk-str">'a'</span>,<span class="tk-str">'b'</span>])->toUpper();</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="accessors-mutators-casts">
+      <h2 class="concept-title">🎭 Accessors, Mutators &amp; Casts</h2>
+      <div class="concept-body">
+        <h3 class="sub-title">Accessors / Mutators — modern Attribute syntax (L9+)</h3>
+        <pre><code><span class="tk-kw">use</span> <span class="tk-class">Illuminate\Database\Eloquent\Casts\Attribute</span>;
+
+<span class="tk-kw">class</span> <span class="tk-class">User</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span>
+{
+    <span class="tk-com">// accessor: $user->full_name</span>
+    <span class="tk-kw">protected</span> <span class="tk-kw">function</span> <span class="tk-fn">fullName</span>(): <span class="tk-class">Attribute</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-class">Attribute</span>::<span class="tk-fn">make</span>(
+            get: <span class="tk-kw">fn</span> ($value, $attributes) => "{$attributes['first_name']} {$attributes['last_name']}",
+        );
+    }
+
+    <span class="tk-com">// mutator: setting $user->password = '...' auto-hashes it</span>
+    <span class="tk-kw">protected</span> <span class="tk-kw">function</span> <span class="tk-fn">password</span>(): <span class="tk-class">Attribute</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-class">Attribute</span>::<span class="tk-fn">make</span>(
+            set: <span class="tk-kw">fn</span> ($value) => <span class="tk-fn">bcrypt</span>($value),
+        );
+    }
+}</code></pre>
+        <div class="version-note"><b>Laravel 8 and earlier:</b> the old syntax used separate magic methods — <code class="inline">getFullNameAttribute()</code> and <code class="inline">setPasswordAttribute($value)</code>. Still works in every version, but the <code class="inline">Attribute::make()</code> syntax (introduced L9) is now the recommended approach — it's more testable and supports caching.</div>
+
+        <h3 class="sub-title">Casts</h3>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span>
+{
+    <span class="tk-kw">protected</span> <span class="tk-kw">function</span> <span class="tk-fn">casts</span>(): <span class="tk-kw">array</span>
+    {
+        <span class="tk-kw">return</span> [
+            <span class="tk-str">'published'</span> => <span class="tk-str">'boolean'</span>,
+            <span class="tk-str">'metadata'</span> => <span class="tk-str">'array'</span>,      <span class="tk-com">// JSON column <-> PHP array, automatic</span>
+            <span class="tk-str">'published_at'</span> => <span class="tk-str">'datetime'</span>,
+            <span class="tk-str">'price'</span> => <span class="tk-str">'decimal:2'</span>,
+        ];
+    }
+}</code></pre>
+        <div class="version-note"><b>Laravel 11+:</b> casts moved from a <code class="inline">protected $casts = [...]</code> property to a <code class="inline">casts(): array</code> method, allowing casts to use constructor-injected dependencies. The old property syntax still works.</div>
+
+        <h3 class="sub-title">Custom cast classes</h3>
+        <pre><code><span class="tk-kw">php</span> artisan make:cast Money</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">Money</span> <span class="tk-kw">implements</span> <span class="tk-class">CastsAttributes</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">get</span>(<span class="tk-var">$model</span>, <span class="tk-var">$key</span>, <span class="tk-var">$value</span>, <span class="tk-var">$attributes</span>): <span class="tk-kw">string</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-fn">number_format</span>(<span class="tk-var">$value</span> / <span class="tk-num">100</span>, <span class="tk-num">2</span>); <span class="tk-com">// stored as cents, displayed as dollars</span>
+    }
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">set</span>(<span class="tk-var">$model</span>, <span class="tk-var">$key</span>, <span class="tk-var">$value</span>, <span class="tk-var">$attributes</span>): <span class="tk-kw">int</span>
+    {
+        <span class="tk-kw">return</span> (<span class="tk-kw">int</span>) (<span class="tk-var">$value</span> * <span class="tk-num">100</span>);
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="scopes">
+      <h2 class="concept-title">🎯 Query Scopes</h2>
+      <div class="concept-body">
+        <h3 class="sub-title">Local scopes — reusable query constraints</h3>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">scopePublished</span>(<span class="tk-class">Builder</span> <span class="tk-var">$query</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$query</span>->where(<span class="tk-str">'published'</span>, <span class="tk-kw">true</span>);
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">scopeByAuthor</span>(<span class="tk-class">Builder</span> <span class="tk-var">$query</span>, <span class="tk-kw">int</span> <span class="tk-var">$userId</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$query</span>->where(<span class="tk-str">'user_id'</span>, <span class="tk-var">$userId</span>);
+    }
+}
+<span class="tk-com">// usage — drop the "scope" prefix and call it like a normal method, chainable:</span>
+<span class="tk-class">Post</span>::<span class="tk-fn">published</span>()->byAuthor(<span class="tk-num">5</span>)->get();</code></pre>
+        <div class="version-note"><b>L11+ note:</b> scopes can also be defined as Attribute-style classes via the new <code class="inline">Scope</code> attribute on methods, but the <code class="inline">scopeXxx()</code> convention above remains the standard, most-used approach across all versions.</div>
+
+        <h3 class="sub-title">Global scopes — applied to EVERY query automatically</h3>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">ActiveScope</span> <span class="tk-kw">implements</span> <span class="tk-class">Scope</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">apply</span>(<span class="tk-class">Builder</span> <span class="tk-var">$builder</span>, <span class="tk-class">Model</span> <span class="tk-var">$model</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$builder</span>->where(<span class="tk-str">'active'</span>, <span class="tk-kw">true</span>);
+    }
+}
+<span class="tk-com">// register in the model's booted() method:</span>
+<span class="tk-kw">protected</span> <span class="tk-kw">static</span> <span class="tk-kw">function</span> <span class="tk-fn">booted</span>(): <span class="tk-kw">void</span>
+{
+    <span class="tk-kw">static</span>::<span class="tk-fn">addGlobalScope</span>(<span class="tk-kw">new</span> <span class="tk-class">ActiveScope</span>);
+}
+<span class="tk-com">// bypass when needed:</span>
+<span class="tk-class">User</span>::<span class="tk-fn">withoutGlobalScope</span>(<span class="tk-class">ActiveScope</span>::<span class="tk-kw">class</span>)->get();</code></pre>
+        <div class="tip"><b>Note:</b> <code class="inline">SoftDeletes</code> works internally via a global scope — that's how <code class="inline">->withTrashed()</code> and <code class="inline">->onlyTrashed()</code> bypass/adjust it.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="model-events-observers">
+      <h2 class="concept-title">📡 Model Events &amp; Observers</h2>
+      <div class="concept-body">
+        <p>Eloquent fires events at each stage of a model's lifecycle: <code class="inline">retrieved, creating, created, updating, updated, saving, saved, deleting, deleted, restoring, restored</code>.</p>
+        <div class="code-label">Quick version — closures in the model</div>
+        <pre><code><span class="tk-kw">protected</span> <span class="tk-kw">static</span> <span class="tk-kw">function</span> <span class="tk-fn">booted</span>(): <span class="tk-kw">void</span>
+{
+    <span class="tk-kw">static</span>::<span class="tk-fn">creating</span>(<span class="tk-kw">function</span> (<span class="tk-class">Post</span> <span class="tk-var">$post</span>) {
+        <span class="tk-var">$post</span>->slug = <span class="tk-class">Str</span>::<span class="tk-fn">slug</span>(<span class="tk-var">$post</span>->title);
+    });
+}</code></pre>
+        <div class="code-label">Scalable version — Observers (preferred for anything non-trivial)</div>
+        <pre><code><span class="tk-kw">php</span> artisan make:observer PostObserver --model=Post</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostObserver</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">creating</span>(<span class="tk-class">Post</span> <span class="tk-var">$post</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$post</span>->slug = <span class="tk-class">Str</span>::<span class="tk-fn">slug</span>(<span class="tk-var">$post</span>->title);
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">deleted</span>(<span class="tk-class">Post</span> <span class="tk-var">$post</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">Cache</span>::<span class="tk-fn">forget</span>(<span class="tk-str">"post.{$post->id}"</span>);
+    }
+}
+<span class="tk-com">// register — in AppServiceProvider::boot(), or via #[ObservedBy] attribute on the model (L10.1+):</span>
+<span class="tk-class">Post</span>::<span class="tk-fn">observe</span>(<span class="tk-class">PostObserver</span>::<span class="tk-kw">class</span>);
+
+<span class="tk-com">// or directly on the model (Laravel 10.1+):</span>
+#[<span class="tk-class">ObservedBy</span>([<span class="tk-class">PostObserver</span>::<span class="tk-kw">class</span>])]
+<span class="tk-kw">class</span> <span class="tk-class">Post</span> <span class="tk-kw">extends</span> <span class="tk-class">Model</span> { ... }</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="pagination">
+      <h2 class="concept-title">📄 Pagination</h2>
+      <div class="concept-body">
+        <table class="ref-table">
+          <tr><th>Method</th><th>How it works</th><th>Best for</th></tr>
+          <tr><td><code class="inline">paginate(15)</code></td><td>Runs a COUNT(*) + the page query, gives page links + total</td><td>Standard pagination with page numbers</td></tr>
+          <tr><td><code class="inline">simplePaginate(15)</code></td><td>Skips COUNT(*), only knows if there's a next page</td><td>Faster — when you only need Next/Prev, not total pages</td></tr>
+          <tr><td><code class="inline">cursorPaginate(15)</code></td><td>Uses a WHERE on the last seen ID/column instead of OFFSET</td><td>Huge tables — OFFSET gets slower the deeper you page</td></tr>
+        </table>
+        <pre><code><span class="tk-com">// controller</span>
+<span class="tk-var">$posts</span> = <span class="tk-class">Post</span>::<span class="tk-fn">latest</span>()->paginate(<span class="tk-num">15</span>);
+<span class="tk-kw">return</span> <span class="tk-fn">view</span>(<span class="tk-str">'posts.index'</span>, [<span class="tk-str">'posts'</span> => <span class="tk-var">$posts</span>]);
+
+<span class="tk-com">// blade — renders page links automatically</span>
+{{ <span class="tk-var">$posts</span>->links() }}
+
+<span class="tk-com">// cursor pagination for huge tables (no OFFSET, no COUNT)</span>
+<span class="tk-var">$posts</span> = <span class="tk-class">Post</span>::<span class="tk-fn">orderBy</span>(<span class="tk-str">'id'</span>)->cursorPaginate(<span class="tk-num">15</span>);</code></pre>
+        <div class="warn"><b>Why it matters:</b> <code class="inline">paginate()</code>'s COUNT(*) and high OFFSET values both get expensive on tables with millions of rows. For deep pagination on large tables, prefer <code class="inline">cursorPaginate()</code>.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="large-datasets">
+      <h2 class="concept-title">🏗️ Large Dataset Handling</h2>
+      <div class="concept-body">
+        <p>Loading millions of rows with <code class="inline">::all()</code> or <code class="inline">::get()</code> will exhaust memory. These methods stream data instead of loading it all at once.</p>
+
+        <table class="ref-table">
+          <tr><th>Method</th><th>How it works</th></tr>
+          <tr><td><code class="inline">chunk(1000, fn)</code></td><td>Fetches 1000 rows at a time, runs your callback on each chunk</td></tr>
+          <tr><td><code class="inline">chunkById(1000, fn)</code></td><td>Same, but paginates by primary key — safe if rows are being deleted/inserted during the loop</td></tr>
+          <tr><td><code class="inline">lazy()</code></td><td>Same chunking under the hood, but returns a flat <code class="inline">LazyCollection</code> you iterate like a normal collection</td></tr>
+          <tr><td><code class="inline">lazyById()</code></td><td><code class="inline">lazy()</code> + the same primary-key-safe pagination as <code class="inline">chunkById</code></td></tr>
+          <tr><td><code class="inline">cursor()</code></td><td>One DB row at a time via a PHP generator — lowest memory footprint, but holds the connection open the whole time</td></tr>
+        </table>
+
+        <div class="code-label">chunk()</div>
+        <pre><code><span class="tk-class">User</span>::<span class="tk-fn">chunk</span>(<span class="tk-num">1000</span>, <span class="tk-kw">function</span> (<span class="tk-class">Collection</span> <span class="tk-var">$users</span>) {
+    <span class="tk-kw">foreach</span> (<span class="tk-var">$users</span> <span class="tk-kw">as</span> <span class="tk-var">$user</span>) {
+        <span class="tk-com">// process each user</span>
+    }
+});</code></pre>
+
+        <div class="code-label">lazy() — feels like a normal collection, but memory-safe</div>
+        <pre><code><span class="tk-class">User</span>::<span class="tk-fn">lazy</span>()->each(<span class="tk-kw">function</span> (<span class="tk-class">User</span> <span class="tk-var">$user</span>) {
+    <span class="tk-com">// runs over ALL users, 1000 at a time under the hood, low memory</span>
+});</code></pre>
+
+        <div class="code-label">cursor() — one row at a time</div>
+        <pre><code><span class="tk-kw">foreach</span> (<span class="tk-class">User</span>::<span class="tk-fn">cursor</span>() <span class="tk-kw">as</span> <span class="tk-var">$user</span>) {
+    <span class="tk-com">// only ONE user in memory at any moment</span>
+}</code></pre>
+        <div class="warn"><b>chunk() pitfall:</b> if your callback updates/deletes rows on the same column you're chunking by, rows can be skipped because the OFFSET shifts. Use <code class="inline">chunkById()</code> in that situation instead.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="transactions">
+      <h2 class="concept-title">🔒 Database Transactions</h2>
+      <div class="concept-body">
+        <p>Wrap multiple writes so they all succeed together, or all roll back if any step fails — critical for operations like "deduct stock AND create order".</p>
+        <pre><code><span class="tk-class">DB</span>::<span class="tk-fn">transaction</span>(<span class="tk-kw">function</span> () {
+    <span class="tk-var">$order</span> = <span class="tk-class">Order</span>::<span class="tk-fn">create</span>([...]);
+    <span class="tk-class">Product</span>::<span class="tk-fn">find</span>(<span class="tk-var">$id</span>)->decrement(<span class="tk-str">'stock'</span>);
+    <span class="tk-com">// if any line above throws, EVERYTHING rolls back automatically</span>
+});
+
+<span class="tk-com">// manual control:</span>
+<span class="tk-class">DB</span>::<span class="tk-fn">beginTransaction</span>();
+<span class="tk-kw">try</span> {
+    <span class="tk-com">// ... writes ...</span>
+    <span class="tk-class">DB</span>::<span class="tk-fn">commit</span>();
+} <span class="tk-kw">catch</span> (<span class="tk-class">\Throwable</span> <span class="tk-var">$e</span>) {
+    <span class="tk-class">DB</span>::<span class="tk-fn">rollBack</span>();
+    <span class="tk-kw">throw</span> <span class="tk-var">$e</span>;
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 3: CORE ARCHITECTURE / INTERNALS -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-3">
+      <span class="part-tag p3">Part 3</span>
+      <h2 class="part-title">Core Architecture &amp; Internals</h2>
+      <p class="part-desc">The Service Container is the heart of Laravel — understanding it unlocks why everything else (facades, dependency injection, providers) works the way it does.</p>
+    </div>
+
+    <section class="concept" id="service-container">
+      <h2 class="concept-title">🧰 Service Container</h2>
+      <div class="concept-body">
+        <p>The container is a big dependency-resolution registry. When you type-hint a class in a controller/job/anywhere Laravel resolves objects, the container figures out how to build it — including its own nested dependencies — automatically.</p>
+
+        <h3 class="sub-title">Automatic resolution (no binding needed for most classes)</h3>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PodcastController</span> <span class="tk-kw">extends</span> <span class="tk-class">Controller</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">show</span>(<span class="tk-class">AudioProcessor</span> <span class="tk-var">$processor</span>) {
+        <span class="tk-com">// Laravel sees the type-hint, builds AudioProcessor (and ITS dependencies) automatically</span>
+    }
+}</code></pre>
+
+        <h3 class="sub-title">bind() vs singleton() vs instance()</h3>
+        <table class="ref-table">
+          <tr><th>Method</th><th>Behavior</th></tr>
+          <tr><td><code class="inline">bind()</code></td><td>New instance created every time it's resolved</td></tr>
+          <tr><td><code class="inline">singleton()</code></td><td>Built once, same instance reused for the rest of the request/app lifecycle</td></tr>
+          <tr><td><code class="inline">instance()</code></td><td>You already have an object — register that exact instance</td></tr>
+        </table>
+        <pre><code><span class="tk-com">// in a Service Provider's register():</span>
+<span class="tk-var">$this</span>->app->bind(<span class="tk-class">PaymentGateway</span>::<span class="tk-kw">class</span>, <span class="tk-kw">fn</span> (<span class="tk-class">Application</span> <span class="tk-var">$app</span>) => <span class="tk-kw">new</span> <span class="tk-class">StripeGateway</span>(<span class="tk-fn">config</span>(<span class="tk-str">'services.stripe.key'</span>)));
+
+<span class="tk-var">$this</span>->app->singleton(<span class="tk-class">MetricsCollector</span>::<span class="tk-kw">class</span>, <span class="tk-kw">fn</span> () => <span class="tk-kw">new</span> <span class="tk-class">MetricsCollector</span>());
+
+<span class="tk-com">// resolving manually anywhere:</span>
+<span class="tk-var">$gateway</span> = app(<span class="tk-class">PaymentGateway</span>::<span class="tk-kw">class</span>);
+<span class="tk-var">$gateway</span> = resolve(<span class="tk-class">PaymentGateway</span>::<span class="tk-kw">class</span>);</code></pre>
+
+        <h3 class="sub-title">Binding an interface to an implementation (the real power move)</h3>
+        <pre><code><span class="tk-com">// register():</span>
+<span class="tk-var">$this</span>->app->bind(<span class="tk-class">PaymentGatewayInterface</span>::<span class="tk-kw">class</span>, <span class="tk-class">StripeGateway</span>::<span class="tk-kw">class</span>);
+
+<span class="tk-com">// now ANY class can type-hint the interface, and the container hands it the concrete implementation:</span>
+<span class="tk-kw">class</span> <span class="tk-class">CheckoutController</span> {
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__construct</span>(<span class="tk-kw">private</span> <span class="tk-class">PaymentGatewayInterface</span> <span class="tk-var">$gateway</span>) {}
+    <span class="tk-com">// swap Stripe for PayPal app-wide by changing ONE line in the provider</span>
+}</code></pre>
+
+        <h3 class="sub-title">Contextual binding</h3>
+        <p>Inject a different implementation depending on which class is asking.</p>
+        <pre><code><span class="tk-var">$this</span>->app->when(<span class="tk-class">PhotoController</span>::<span class="tk-kw">class</span>)
+    ->needs(<span class="tk-class">Filesystem</span>::<span class="tk-kw">class</span>)
+    ->give(<span class="tk-kw">fn</span> () => <span class="tk-class">Storage</span>::<span class="tk-fn">disk</span>(<span class="tk-str">'local'</span>));
+
+<span class="tk-var">$this</span>->app->when(<span class="tk-class">VideoController</span>::<span class="tk-kw">class</span>)
+    ->needs(<span class="tk-class">Filesystem</span>::<span class="tk-kw">class</span>)
+    ->give(<span class="tk-kw">fn</span> () => <span class="tk-class">Storage</span>::<span class="tk-fn">disk</span>(<span class="tk-str">'s3'</span>));</code></pre>
+
+        <h3 class="sub-title">Tagging — resolve a group of related bindings at once</h3>
+        <pre><code><span class="tk-var">$this</span>->app->tag([<span class="tk-class">CpuReport</span>::<span class="tk-kw">class</span>, <span class="tk-class">MemoryReport</span>::<span class="tk-kw">class</span>], <span class="tk-str">'reports'</span>);
+<span class="tk-var">$reports</span> = <span class="tk-var">$this</span>->app->tagged(<span class="tk-str">'reports'</span>); <span class="tk-com">// iterable of all tagged instances</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="service-providers">
+      <h2 class="concept-title">🏗️ Service Providers</h2>
+      <div class="concept-body">
+        <p>Service Providers are where all of Laravel's (and your app's) bootstrapping happens — binding things into the container, registering routes/views/event listeners, etc.</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:provider PaymentServiceProvider</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PaymentServiceProvider</span> <span class="tk-kw">extends</span> <span class="tk-class">ServiceProvider</span>
+{
+    <span class="tk-com">// register(): ONLY bind things here. Other providers may not be loaded yet.</span>
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">register</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$this</span>->app->singleton(<span class="tk-class">PaymentGatewayInterface</span>::<span class="tk-kw">class</span>, <span class="tk-class">StripeGateway</span>::<span class="tk-kw">class</span>);
+    }
+
+    <span class="tk-com">// boot(): runs AFTER all providers are registered — safe to use other services here</span>
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">boot</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">View</span>::<span class="tk-fn">share</span>(<span class="tk-str">'siteName'</span>, <span class="tk-fn">config</span>(<span class="tk-str">'app.name'</span>));
+    }
+}</code></pre>
+        <div class="version-note"><b>Laravel 11+:</b> new providers are registered in <code class="inline">bootstrap/providers.php</code> (a plain array), not <code class="inline">config/app.php</code>'s <code class="inline">providers</code> array as in L8–10. Both work if you've upgraded an older app rather than starting fresh.</div>
+
+        <h3 class="sub-title">Deferred providers — only loaded when actually needed</h3>
+        <pre><code><span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">isDeferred</span>(): <span class="tk-kw">bool</span> { <span class="tk-kw">return</span> <span class="tk-kw">true</span>; } <span class="tk-com">// (older mechanism)</span>
+<span class="tk-com">// modern: implement the Illuminate\Contracts\Support\DeferrableProvider interface</span>
+<span class="tk-kw">class</span> <span class="tk-class">PaymentServiceProvider</span> <span class="tk-kw">extends</span> <span class="tk-class">ServiceProvider</span> <span class="tk-kw">implements</span> <span class="tk-class">DeferrableProvider</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">provides</span>(): <span class="tk-kw">array</span> { <span class="tk-kw">return</span> [<span class="tk-class">PaymentGatewayInterface</span>::<span class="tk-kw">class</span>]; }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="facades">
+      <h2 class="concept-title">🎭 Facades</h2>
+      <div class="concept-body">
+        <p>A Facade (<code class="inline">Cache::get()</code>, <code class="inline">Route::get()</code>, etc.) is a static-looking proxy to an object resolved from the container. It's not magic — it just calls <code class="inline">__callStatic</code>, which resolves the real instance and forwards the call.</p>
+        <pre><code><span class="tk-com">// what Cache::get('key') actually does under the hood, roughly:</span>
+<span class="tk-kw">class</span> <span class="tk-class">Cache</span> <span class="tk-kw">extends</span> <span class="tk-class">Facade</span>
+{
+    <span class="tk-kw">protected</span> <span class="tk-kw">static</span> <span class="tk-kw">function</span> <span class="tk-fn">getFacadeAccessor</span>() { <span class="tk-kw">return</span> <span class="tk-str">'cache'</span>; } <span class="tk-com">// the container binding key</span>
+}
+<span class="tk-com">// Cache::get('key') resolves app('cache') from the container, then calls ->get('key') on it</span></code></pre>
+        <h3 class="sub-title">Real instance vs facade — interchangeable</h3>
+        <pre><code><span class="tk-class">Cache</span>::<span class="tk-fn">put</span>(<span class="tk-str">'key'</span>, <span class="tk-str">'value'</span>, <span class="tk-num">60</span>);          <span class="tk-com">// facade</span>
+app(<span class="tk-str">'cache'</span>)->put(<span class="tk-str">'key'</span>, <span class="tk-str">'value'</span>, <span class="tk-num">60</span>);  <span class="tk-com">// same thing, resolved directly</span></code></pre>
+
+        <h3 class="sub-title">Facades vs Contracts (interfaces)</h3>
+        <p>Facades are convenient and very testable via <code class="inline">Cache::shouldReceive()</code> mocking, but they hide the dependency. Constructor-injecting a Contract (e.g. <code class="inline">Illuminate\Contracts\Cache\Repository</code>) makes the dependency explicit — preferred in packages or when testing without facade mocks. Both call the exact same underlying object.</p>
+
+        <h3 class="sub-title">Real-time facades</h3>
+        <pre><code><span class="tk-kw">use</span> <span class="tk-class">Facades\App\Services\PaymentGateway</span>;
+<span class="tk-class">PaymentGateway</span>::<span class="tk-fn">charge</span>(<span class="tk-num">100</span>); <span class="tk-com">// turns any class into a facade just by aliasing the import with "Facades\"</span></code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 4: AUTHENTICATION & AUTHORIZATION -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-4">
+      <span class="part-tag p4">Part 4</span>
+      <h2 class="part-title">Authentication &amp; Authorization</h2>
+      <p class="part-desc">Who is the user (authentication), and what are they allowed to do (authorization) — guards, providers, Sanctum, Gates, and Policies.</p>
+    </div>
+
+    <section class="concept" id="auth-scaffolding">
+      <h2 class="concept-title">🏁 Auth Scaffolding Options</h2>
+      <div class="concept-body">
+        <table class="ref-table">
+          <tr><th>Package</th><th>What it gives you</th></tr>
+          <tr><td><b>Breeze</b></td><td>Minimal login/register/reset views + routes, using Blade or a JS stack (Vue/React via Inertia). Best starting point for most apps.</td></tr>
+          <tr><td><b>Jetstream</b></td><td>Breeze + extras: teams, API tokens (Sanctum), two-factor auth, profile management UI. Heavier, opinionated.</td></tr>
+          <tr><td><b>Fortify</b></td><td>Headless backend logic only (no views) — used when you want full control over the frontend.</td></tr>
+          <tr><td><b>Sanctum</b></td><td>Lightweight API token + SPA cookie authentication — see below.</td></tr>
+          <tr><td><b>Passport</b></td><td>Full OAuth2 server — only needed if you're issuing tokens to third-party apps.</td></tr>
+        </table>
+        <pre><code><span class="tk-kw">composer</span> require laravel/breeze --dev
+<span class="tk-kw">php</span> artisan breeze:install</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="guards-providers">
+      <h2 class="concept-title">🛡️ Guards &amp; Providers</h2>
+      <div class="concept-body">
+        <p>In <code class="inline">config/auth.php</code>: a <b>guard</b> defines how users are authenticated per request (session vs token); a <b>provider</b> defines how user records are retrieved (usually Eloquent).</p>
+        <pre><code><span class="tk-com">// config/auth.php</span>
+<span class="tk-str">'guards'</span> => [
+    <span class="tk-str">'web'</span> => [<span class="tk-str">'driver'</span> => <span class="tk-str">'session'</span>, <span class="tk-str">'provider'</span> => <span class="tk-str">'users'</span>],
+    <span class="tk-str">'api'</span> => [<span class="tk-str">'driver'</span> => <span class="tk-str">'sanctum'</span>, <span class="tk-str">'provider'</span> => <span class="tk-str">'users'</span>],
+],
+<span class="tk-str">'providers'</span> => [
+    <span class="tk-str">'users'</span> => [<span class="tk-str">'driver'</span> => <span class="tk-str">'eloquent'</span>, <span class="tk-str">'model'</span> => <span class="tk-class">App\Models\User</span>::<span class="tk-kw">class</span>],
+],</code></pre>
+        <pre><code><span class="tk-class">Auth</span>::<span class="tk-fn">guard</span>(<span class="tk-str">'api'</span>)->user();    <span class="tk-com">// check a specific guard</span>
+<span class="tk-class">Auth</span>::<span class="tk-fn">attempt</span>([<span class="tk-str">'email'</span> => <span class="tk-var">$email</span>, <span class="tk-str">'password'</span> => <span class="tk-var">$password</span>]); <span class="tk-com">// login</span>
+<span class="tk-class">Auth</span>::<span class="tk-fn">user</span>();                  <span class="tk-com">// current authenticated user (default guard)</span>
+<span class="tk-class">Auth</span>::<span class="tk-fn">logout</span>();</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="sanctum">
+      <h2 class="concept-title">🔑 Sanctum (API Tokens &amp; SPA Auth)</h2>
+      <div class="concept-body">
+        <p>Sanctum handles two separate use cases with one package: <b>API tokens</b> for mobile apps/third-party clients, and <b>cookie-based auth</b> for SPAs that live on the same domain (or subdomain) as the API.</p>
+
+        <h3 class="sub-title">API tokens</h3>
+        <pre><code><span class="tk-kw">use</span> <span class="tk-class">Laravel\Sanctum\HasApiTokens</span>;
+<span class="tk-kw">class</span> <span class="tk-class">User</span> <span class="tk-kw">extends</span> <span class="tk-class">Authenticatable</span> {
+    <span class="tk-kw">use</span> <span class="tk-class">HasApiTokens</span>;
+}
+
+<span class="tk-com">// issuing a token (e.g. after login):</span>
+<span class="tk-var">$token</span> = <span class="tk-var">$user</span>->createToken(<span class="tk-str">'mobile-app'</span>)->plainTextToken;
+
+<span class="tk-com">// client sends it as: Authorization: Bearer {token}</span>
+<span class="tk-com">// protect routes:</span>
+<span class="tk-class">Route</span>::<span class="tk-fn">middleware</span>(<span class="tk-str">'auth:sanctum'</span>)->get(<span class="tk-str">'/user'</span>, <span class="tk-kw">fn</span> (<span class="tk-class">Request</span> <span class="tk-var">$r</span>) => <span class="tk-var">$r</span>->user());
+
+<span class="tk-com">// scoping token abilities:</span>
+<span class="tk-var">$user</span>->createToken(<span class="tk-str">'mobile-app'</span>, [<span class="tk-str">'posts:read'</span>]);
+<span class="tk-kw">if</span> (<span class="tk-var">$request</span>->user()->tokenCan(<span class="tk-str">'posts:read'</span>)) { ... }</code></pre>
+        <div class="version-note"><b>Laravel 10+:</b> Sanctum is the default API auth choice in new starter kits (replacing Passport for most use cases) since it's much simpler when you don't need full OAuth2.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="gates">
+      <h2 class="concept-title">🚪 Gates</h2>
+      <div class="concept-body">
+        <p>Gates are simple closure-based authorization checks — best for actions that aren't tied to a specific model (e.g. "can view the admin panel").</p>
+        <pre><code><span class="tk-com">// AppServiceProvider::boot()</span>
+<span class="tk-class">Gate</span>::<span class="tk-fn">define</span>(<span class="tk-str">'view-admin-panel'</span>, <span class="tk-kw">function</span> (<span class="tk-class">User</span> <span class="tk-var">$user</span>) {
+    <span class="tk-kw">return</span> <span class="tk-var">$user</span>->role === <span class="tk-str">'admin'</span>;
+});
+
+<span class="tk-com">// usage:</span>
+<span class="tk-kw">if</span> (<span class="tk-class">Gate</span>::<span class="tk-fn">allows</span>(<span class="tk-str">'view-admin-panel'</span>)) { ... }
+<span class="tk-class">Gate</span>::<span class="tk-fn">authorize</span>(<span class="tk-str">'view-admin-panel'</span>); <span class="tk-com">// throws 403 if denied</span>
+
+<span class="tk-com">// in Blade:</span>
+@can(<span class="tk-str">'view-admin-panel'</span>)
+    &lt;a href=<span class="tk-str">"/admin"</span>&gt;Admin&lt;/a&gt;
+@endcan</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="policies">
+      <h2 class="concept-title">📋 Policies</h2>
+      <div class="concept-body">
+        <p>Policies are classes for organizing authorization logic around a specific model — e.g. "can THIS user update THIS post".</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:policy PostPolicy --model=Post</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostPolicy</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">update</span>(<span class="tk-class">User</span> <span class="tk-var">$user</span>, <span class="tk-class">Post</span> <span class="tk-var">$post</span>): <span class="tk-kw">bool</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-var">$user</span>->id === <span class="tk-var">$post</span>->user_id;
+    }
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">delete</span>(<span class="tk-class">User</span> <span class="tk-var">$user</span>, <span class="tk-class">Post</span> <span class="tk-var">$post</span>): <span class="tk-kw">bool</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-var">$user</span>->id === <span class="tk-var">$post</span>->user_id || <span class="tk-var">$user</span>->isAdmin();
+    }
+}</code></pre>
+        <div class="version-note"><b>Laravel 11+:</b> Policies are <b>auto-discovered</b> by naming convention (<code class="inline">PostPolicy</code> for <code class="inline">Post</code>) — no manual registration needed in most cases. L8–10 required registering them in <code class="inline">AuthServiceProvider</code>'s <code class="inline">$policies</code> array.</div>
+
+        <h3 class="sub-title">Using policies</h3>
+        <pre><code><span class="tk-com">// in a controller:</span>
+<span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">update</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>, <span class="tk-class">Post</span> <span class="tk-var">$post</span>) {
+    <span class="tk-var">$this</span>->authorize(<span class="tk-str">'update'</span>, <span class="tk-var">$post</span>); <span class="tk-com">// throws 403 automatically if denied</span>
+    <span class="tk-com">// ...</span>
+}
+
+<span class="tk-com">// directly:</span>
+<span class="tk-kw">if</span> (<span class="tk-var">$user</span>->can(<span class="tk-str">'update'</span>, <span class="tk-var">$post</span>)) { ... }
+
+<span class="tk-com">// in Blade:</span>
+@can(<span class="tk-str">'update'</span>, <span class="tk-var">$post</span>)
+    &lt;a href=<span class="tk-str">"/posts/{{ $post->id }}/edit"</span>&gt;Edit&lt;/a&gt;
+@endcan</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 5: QUEUES, JOBS & EVENTS -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-5">
+      <span class="part-tag p5">Part 5</span>
+      <h2 class="part-title">Queues, Jobs &amp; Events</h2>
+      <p class="part-desc">Moving heavy work out of the request-response cycle — this is what separates hobby apps from production apps.</p>
+    </div>
+
+    <section class="concept" id="jobs">
+      <h2 class="concept-title">⚙️ Jobs &amp; Dispatching</h2>
+      <div class="concept-body">
+        <p>A Job is a class representing one unit of work that can run asynchronously on a queue — sending an email, generating a PDF, calling a slow third-party API, etc.</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:job ProcessPodcast</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">ProcessPodcast</span> <span class="tk-kw">implements</span> <span class="tk-class">ShouldQueue</span>
+{
+    <span class="tk-kw">use</span> <span class="tk-class">Queueable</span>;
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__construct</span>(<span class="tk-kw">public</span> <span class="tk-class">Podcast</span> <span class="tk-var">$podcast</span>) {} <span class="tk-com">// $podcast is serialized & stored with the job</span>
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">handle</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-com">// the actual work — runs on the queue worker, not the web request</span>
+    }
+}
+
+<span class="tk-com">// dispatching:</span>
+<span class="tk-class">ProcessPodcast</span>::<span class="tk-fn">dispatch</span>(<span class="tk-var">$podcast</span>);
+<span class="tk-class">ProcessPodcast</span>::<span class="tk-fn">dispatch</span>(<span class="tk-var">$podcast</span>)->delay(<span class="tk-fn">now</span>()->addMinutes(<span class="tk-num">10</span>));
+<span class="tk-class">ProcessPodcast</span>::<span class="tk-fn">dispatch</span>(<span class="tk-var">$podcast</span>)->onQueue(<span class="tk-str">'high-priority'</span>);</code></pre>
+
+        <h3 class="sub-title">Job chaining &amp; batching</h3>
+        <pre><code><span class="tk-com">// chain — run in sequence, stop if any fails</span>
+<span class="tk-class">Bus</span>::<span class="tk-fn">chain</span>([
+    <span class="tk-kw">new</span> <span class="tk-class">ProcessPodcast</span>(<span class="tk-var">$podcast</span>),
+    <span class="tk-kw">new</span> <span class="tk-class">OptimizeAudio</span>(<span class="tk-var">$podcast</span>),
+    <span class="tk-kw">new</span> <span class="tk-class">NotifySubscribers</span>(<span class="tk-var">$podcast</span>),
+])->dispatch();
+
+<span class="tk-com">// batch — run in parallel, track collective progress/completion</span>
+<span class="tk-class">Bus</span>::<span class="tk-fn">batch</span>([
+    <span class="tk-kw">new</span> <span class="tk-class">ImportCsvRow</span>(<span class="tk-num">1</span>), <span class="tk-kw">new</span> <span class="tk-class">ImportCsvRow</span>(<span class="tk-num">2</span>),
+])->then(<span class="tk-kw">fn</span> (<span class="tk-class">Batch</span> <span class="tk-var">$batch</span>) => <span class="tk-com">/* all jobs succeeded */</span>)
+  ->catch(<span class="tk-kw">fn</span> (<span class="tk-class">Batch</span> <span class="tk-var">$batch</span>, <span class="tk-class">Throwable</span> <span class="tk-var">$e</span>) => <span class="tk-com">/* a job failed */</span>)
+  ->dispatch();</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="queue-drivers-workers">
+      <h2 class="concept-title">🚚 Queue Drivers &amp; Workers</h2>
+      <div class="concept-body">
+        <table class="ref-table">
+          <tr><th>Driver</th><th>Use case</th></tr>
+          <tr><td><code class="inline">sync</code></td><td>Runs immediately, no real queueing (local dev default)</td></tr>
+          <tr><td><code class="inline">database</code></td><td>Simple, stores jobs in a DB table — fine for low/medium volume</td></tr>
+          <tr><td><code class="inline">redis</code></td><td>Fast, most common production choice</td></tr>
+          <tr><td><code class="inline">sqs</code></td><td>AWS-managed queue — good for cloud-native, auto-scaling setups</td></tr>
+        </table>
+        <pre><code><span class="tk-com"># .env</span>
+QUEUE_CONNECTION=redis
+
+<span class="tk-com"># running a worker (must stay running — use Supervisor in production)</span>
+<span class="tk-kw">php</span> artisan queue:work
+<span class="tk-kw">php</span> artisan queue:work --queue=high-priority,default <span class="tk-com"># priority order</span>
+<span class="tk-kw">php</span> artisan queue:work --tries=3  <span class="tk-com"># retry attempts before marking failed</span></code></pre>
+        <div class="tip"><b>Production:</b> use <b>Supervisor</b> (Linux process monitor) to keep <code class="inline">queue:work</code> running and auto-restart it if it crashes. After deploying new code, run <code class="inline">php artisan queue:restart</code> so workers pick up the new code (workers cache code in memory and won't see changes otherwise).</div>
+      </div>
+    </section>
+
+    <section class="concept" id="failed-jobs">
+      <h2 class="concept-title">⚠️ Failed Jobs &amp; Retries</h2>
+      <div class="concept-body">
+        <pre><code><span class="tk-kw">php</span> artisan queue:failed-table  <span class="tk-com"># migration for the failed_jobs table</span>
+<span class="tk-kw">php</span> artisan migrate
+<span class="tk-kw">php</span> artisan queue:failed         <span class="tk-com"># list failed jobs</span>
+<span class="tk-kw">php</span> artisan queue:retry <span class="tk-num">5</span>           <span class="tk-com"># retry a specific failed job by ID</span>
+<span class="tk-kw">php</span> artisan queue:retry all       <span class="tk-com"># retry everything</span></code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">ProcessPodcast</span> <span class="tk-kw">implements</span> <span class="tk-class">ShouldQueue</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">int</span> <span class="tk-var">$tries</span> = <span class="tk-num">3</span>;            <span class="tk-com">// retry up to 3 times</span>
+    <span class="tk-kw">public</span> <span class="tk-kw">int</span> <span class="tk-var">$backoff</span> = <span class="tk-num">60</span>;          <span class="tk-com">// wait 60s between retries</span>
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">failed</span>(<span class="tk-class">Throwable</span> <span class="tk-var">$exception</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-com">// notify admin, log, etc. — runs after ALL retries are exhausted</span>
+    }
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="events-listeners">
+      <h2 class="concept-title">📢 Events &amp; Listeners</h2>
+      <div class="concept-body">
+        <p>Events decouple your app: instead of a controller calling five things directly, it fires one event, and any number of independent Listeners react to it.</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:event OrderShipped
+<span class="tk-kw">php</span> artisan make:listener SendShipmentNotification --event=OrderShipped</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">OrderShipped</span>
+{
+    <span class="tk-kw">use</span> <span class="tk-class">Dispatchable</span>;
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__construct</span>(<span class="tk-kw">public</span> <span class="tk-class">Order</span> <span class="tk-var">$order</span>) {}
+}
+
+<span class="tk-kw">class</span> <span class="tk-class">SendShipmentNotification</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">handle</span>(<span class="tk-class">OrderShipped</span> <span class="tk-var">$event</span>): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">Mail</span>::<span class="tk-fn">to</span>(<span class="tk-var">$event</span>->order->user)->send(<span class="tk-kw">new</span> <span class="tk-class">OrderShippedMail</span>(<span class="tk-var">$event</span>->order));
+    }
+}
+
+<span class="tk-com">// firing it:</span>
+<span class="tk-class">OrderShipped</span>::<span class="tk-fn">dispatch</span>(<span class="tk-var">$order</span>);</code></pre>
+        <div class="version-note"><b>Laravel 11+:</b> events/listeners are <b>auto-discovered</b> — no need to register them in <code class="inline">EventServiceProvider</code> unless you want explicit control. L8–10 required manual registration in <code class="inline">$listen</code>.</div>
+        <h3 class="sub-title">Queueing a listener</h3>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">SendShipmentNotification</span> <span class="tk-kw">implements</span> <span class="tk-class">ShouldQueue</span> { <span class="tk-com">// just add this interface</span>
+    <span class="tk-com">// handle() now runs on the queue instead of synchronously</span>
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 6: API DEVELOPMENT -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-6">
+      <span class="part-tag p6">Part 6</span>
+      <h2 class="part-title">API Development</h2>
+      <p class="part-desc">Shaping data for consumption by mobile apps, SPAs, and third parties — resources, versioning, rate limiting, and error handling.</p>
+    </div>
+
+    <section class="concept" id="api-resources">
+      <h2 class="concept-title">📦 API Resources</h2>
+      <div class="concept-body">
+        <p>Resources transform Eloquent models/collections into clean, controlled JSON — instead of exposing raw model attributes (which can leak internal fields).</p>
+        <pre><code><span class="tk-kw">php</span> artisan make:resource PostResource
+<span class="tk-kw">php</span> artisan make:resource PostCollection</code></pre>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostResource</span> <span class="tk-kw">extends</span> <span class="tk-class">JsonResource</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">toArray</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>): <span class="tk-kw">array</span>
+    {
+        <span class="tk-kw">return</span> [
+            <span class="tk-str">'id'</span> => <span class="tk-var">$this</span>->id,
+            <span class="tk-str">'title'</span> => <span class="tk-var">$this</span>->title,
+            <span class="tk-str">'author'</span> => <span class="tk-var">$this</span>->user->name,        <span class="tk-com">// reshape relations however you like</span>
+            <span class="tk-str">'published_at'</span> => <span class="tk-var">$this</span>->published_at?->toIso8601String(),
+            <span class="tk-str">'comments_count'</span> => <span class="tk-var">$this</span>->whenCounted(<span class="tk-str">'comments'</span>), <span class="tk-com">// only included if withCount() was used</span>
+        ];
+    }
+}
+
+<span class="tk-com">// controller:</span>
+<span class="tk-kw">return</span> <span class="tk-kw">new</span> <span class="tk-class">PostResource</span>(<span class="tk-var">$post</span>);
+<span class="tk-kw">return</span> <span class="tk-class">PostResource</span>::<span class="tk-fn">collection</span>(<span class="tk-class">Post</span>::<span class="tk-fn">paginate</span>()); <span class="tk-com">// pagination meta is preserved automatically</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="api-versioning">
+      <h2 class="concept-title">🔢 API Versioning</h2>
+      <div class="concept-body">
+        <p>Common approaches, roughly in order of how often they're used in production:</p>
+        <table class="ref-table">
+          <tr><th>Approach</th><th>Example</th></tr>
+          <tr><td>URI prefix</td><td><code class="inline">/api/v1/posts</code>, <code class="inline">/api/v2/posts</code> — route group prefix, simplest and most common</td></tr>
+          <tr><td>Header-based</td><td><code class="inline">Accept: application/vnd.myapp.v2+json</code> — cleaner URLs, more complex routing</td></tr>
+          <tr><td>Separate Resource classes per version</td><td><code class="inline">V1\PostResource</code> vs <code class="inline">V2\PostResource</code> sharing the same model</td></tr>
+        </table>
+        <pre><code><span class="tk-class">Route</span>::<span class="tk-fn">prefix</span>(<span class="tk-str">'v1'</span>)->group(<span class="tk-kw">function</span> () {
+    <span class="tk-class">Route</span>::<span class="tk-fn">apiResource</span>(<span class="tk-str">'posts'</span>, <span class="tk-class">Api\V1\PostController</span>::<span class="tk-kw">class</span>);
+});</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="api-error-handling">
+      <h2 class="concept-title">🚨 API Error Handling</h2>
+      <div class="concept-body">
+        <p>By default, Laravel returns JSON automatically for exceptions when the request expects JSON (e.g. <code class="inline">Accept: application/json</code>). Form Request validation failures auto-respond with a 422 + an <code class="inline">errors</code> object.</p>
+        <pre><code><span class="tk-com">// bootstrap/app.php (L11+) — custom exception rendering</span>
+->withExceptions(<span class="tk-kw">function</span> (<span class="tk-class">Exceptions</span> <span class="tk-var">$exceptions</span>) {
+    <span class="tk-var">$exceptions</span>->render(<span class="tk-kw">function</span> (<span class="tk-class">ModelNotFoundException</span> <span class="tk-var">$e</span>, <span class="tk-class">Request</span> <span class="tk-var">$request</span>) {
+        <span class="tk-kw">if</span> (<span class="tk-var">$request</span>->is(<span class="tk-str">'api/*'</span>)) {
+            <span class="tk-kw">return</span> <span class="tk-fn">response</span>()->json([<span class="tk-str">'message'</span> => <span class="tk-str">'Resource not found.'</span>], <span class="tk-num">404</span>);
+        }
+    });
+})</code></pre>
+        <div class="version-note"><b>Laravel 8–10:</b> custom exception rendering was done by overriding <code class="inline">render()</code> in <code class="inline">app/Exceptions/Handler.php</code>. L11+ moved this to the fluent <code class="inline">withExceptions()</code> closure in <code class="inline">bootstrap/app.php</code>.</div>
+
+        <h3 class="sub-title">Rate limiting an API</h3>
+        <pre><code><span class="tk-com">// in a service provider, or RouteServiceProvider on older versions:</span>
+<span class="tk-class">RateLimiter</span>::<span class="tk-fn">for</span>(<span class="tk-str">'api'</span>, <span class="tk-kw">function</span> (<span class="tk-class">Request</span> <span class="tk-var">$request</span>) {
+    <span class="tk-kw">return</span> <span class="tk-class">Limit</span>::<span class="tk-fn">perMinute</span>(<span class="tk-num">60</span>)->by(<span class="tk-var">$request</span>->user()?->id ?: <span class="tk-var">$request</span>->ip());
+});</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 7: TESTING -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-7">
+      <span class="part-tag p1">Part 7</span>
+      <h2 class="part-title">Testing</h2>
+      <p class="part-desc">PHPUnit/Pest, feature and unit tests, HTTP testing helpers, database testing, and mocking.</p>
+    </div>
+
+    <section class="concept" id="testing-setup">
+      <h2 class="concept-title">🧪 PHPUnit vs Pest</h2>
+      <div class="concept-body">
+        <p>Laravel ships with PHPUnit by default. <b>Pest</b> is a more expressive testing framework built on top of PHPUnit — same engine, nicer syntax. Both run with <code class="inline">php artisan test</code>.</p>
+        <div class="grid-2">
+          <div>
+            <div class="code-label">PHPUnit style</div>
+            <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostTest</span> <span class="tk-kw">extends</span> <span class="tk-class">TestCase</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">test_post_can_be_created</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-var">$post</span> = <span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->create();
+        <span class="tk-var">$this</span>->assertDatabaseHas(<span class="tk-str">'posts'</span>, [<span class="tk-str">'id'</span> => <span class="tk-var">$post</span>->id]);
+    }
+}</code></pre>
+          </div>
+          <div>
+            <div class="code-label">Pest style</div>
+            <pre><code><span class="tk-fn">it</span>(<span class="tk-str">'creates a post'</span>, <span class="tk-kw">function</span> () {
+    <span class="tk-var">$post</span> = <span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->create();
+    <span class="tk-fn">expect</span>(<span class="tk-var">$post</span>)->toBeInstanceOf(<span class="tk-class">Post</span>::<span class="tk-kw">class</span>);
+    <span class="tk-var">$this</span>->assertDatabaseHas(<span class="tk-str">'posts'</span>, [<span class="tk-str">'id'</span> => <span class="tk-var">$post</span>->id]);
+});</code></pre>
+          </div>
+        </div>
+        <pre><code><span class="tk-kw">php</span> artisan make:test PostTest          <span class="tk-com"># Feature test (boots the full app)</span>
+<span class="tk-kw">php</span> artisan make:test PostTest --unit   <span class="tk-com"># Unit test (no app boot, isolated logic)</span></code></pre>
+        <h3 class="sub-title">Feature vs Unit tests</h3>
+        <p><b>Unit tests</b> test a single class/method in isolation with no framework boot — fast, but most real app logic touches the DB or framework, so they're used less in typical Laravel apps. <b>Feature tests</b> boot the full app and test the whole flow (HTTP request → DB → response) — this is where most Laravel test coverage lives.</p>
+      </div>
+    </section>
+
+    <section class="concept" id="http-testing">
+      <h2 class="concept-title">🌐 HTTP Testing Helpers</h2>
+      <div class="concept-body">
+        <pre><code><span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">test_guest_is_redirected_to_login</span>(): <span class="tk-kw">void</span>
+{
+    <span class="tk-var">$response</span> = <span class="tk-var">$this</span>->get(<span class="tk-str">'/dashboard'</span>);
+    <span class="tk-var">$response</span>->assertRedirect(<span class="tk-str">'/login'</span>);
+}
+
+<span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">test_authenticated_user_can_create_post</span>(): <span class="tk-kw">void</span>
+{
+    <span class="tk-var">$user</span> = <span class="tk-class">User</span>::<span class="tk-fn">factory</span>()->create();
+
+    <span class="tk-var">$response</span> = <span class="tk-var">$this</span>->actingAs(<span class="tk-var">$user</span>)
+        ->post(<span class="tk-str">'/posts'</span>, [<span class="tk-str">'title'</span> => <span class="tk-str">'Hello'</span>, <span class="tk-str">'body'</span> => <span class="tk-str">'World'</span>]);
+
+    <span class="tk-var">$response</span>->assertStatus(<span class="tk-num">302</span>);
+    <span class="tk-var">$response</span>->assertSessionHasNoErrors();
+    <span class="tk-var">$this</span>->assertDatabaseHas(<span class="tk-str">'posts'</span>, [<span class="tk-str">'title'</span> => <span class="tk-str">'Hello'</span>]);
+}
+
+<span class="tk-com">// JSON API testing:</span>
+<span class="tk-var">$response</span> = <span class="tk-var">$this</span>->getJson(<span class="tk-str">'/api/posts'</span>);
+<span class="tk-var">$response</span>->assertOk()->assertJsonCount(<span class="tk-num">3</span>)->assertJsonStructure([<span class="tk-str">'data'</span> => [<span class="tk-str">'*'</span> => [<span class="tk-str">'id'</span>, <span class="tk-str">'title'</span>]]]);</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="database-testing">
+      <h2 class="concept-title">🗄️ Database Testing</h2>
+      <div class="concept-body">
+        <p><code class="inline">RefreshDatabase</code> resets your test database between tests so each test starts clean — essential since tests can run in any order and shouldn't depend on each other's leftover data.</p>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">PostTest</span> <span class="tk-kw">extends</span> <span class="tk-class">TestCase</span>
+{
+    <span class="tk-kw">use</span> <span class="tk-class">RefreshDatabase</span>; <span class="tk-com">// wraps each test in a transaction, rolls back after</span>
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">test_example</span>(): <span class="tk-kw">void</span>
+    {
+        <span class="tk-class">Post</span>::<span class="tk-fn">factory</span>()->count(<span class="tk-num">3</span>)->create();
+        <span class="tk-var">$this</span>->assertDatabaseCount(<span class="tk-str">'posts'</span>, <span class="tk-num">3</span>);
+    }
+}</code></pre>
+        <div class="tip"><b>Tip:</b> Set a dedicated <code class="inline">DB_CONNECTION</code>/database for testing in <code class="inline">phpunit.xml</code> (often SQLite in-memory: <code class="inline">DB_CONNECTION=sqlite</code>, <code class="inline">DB_DATABASE=:memory:</code>) — much faster than hitting MySQL for every test run.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="mocking">
+      <h2 class="concept-title">🎭 Mocking</h2>
+      <div class="concept-body">
+        <p>Mocking replaces real dependencies (APIs, mail, queues) with fakes during a test, so you're not actually sending emails or hitting third-party services.</p>
+        <pre><code><span class="tk-class">Mail</span>::<span class="tk-fn">fake</span>();
+<span class="tk-com">// ... perform action that should send mail ...</span>
+<span class="tk-class">Mail</span>::<span class="tk-fn">assertSent</span>(<span class="tk-class">OrderShippedMail</span>::<span class="tk-kw">class</span>);
+
+<span class="tk-class">Queue</span>::<span class="tk-fn">fake</span>();
+<span class="tk-com">// ... perform action that should dispatch a job ...</span>
+<span class="tk-class">Queue</span>::<span class="tk-fn">assertPushed</span>(<span class="tk-class">ProcessPodcast</span>::<span class="tk-kw">class</span>);
+
+<span class="tk-class">Http</span>::<span class="tk-fn">fake</span>([
+    <span class="tk-str">'api.stripe.com/*'</span> => <span class="tk-class">Http</span>::<span class="tk-fn">response</span>([<span class="tk-str">'status'</span> => <span class="tk-str">'ok'</span>], <span class="tk-num">200</span>),
+]);
+
+<span class="tk-com">// mocking a bound interface/class directly:</span>
+<span class="tk-var">$this</span>->mock(<span class="tk-class">PaymentGatewayInterface</span>::<span class="tk-kw">class</span>, <span class="tk-kw">function</span> (<span class="tk-class">MockInterface</span> <span class="tk-var">$mock</span>) {
+    <span class="tk-var">$mock</span>->shouldReceive(<span class="tk-str">'charge'</span>)->once()->andReturn(<span class="tk-kw">true</span>);
+});</code></pre>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 8: PERFORMANCE -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-8">
+      <span class="part-tag p2">Part 8</span>
+      <h2 class="part-title">Performance</h2>
+      <p class="part-desc">Caching strategies, production-only caching commands, and opcode caching — the layer on top of query optimization (Part 2) that gets apps production-fast.</p>
+    </div>
+
+    <section class="concept" id="caching">
+      <h2 class="concept-title">🚀 Caching</h2>
+      <div class="concept-body">
+        <table class="ref-table">
+          <tr><th>Driver</th><th>Use case</th></tr>
+          <tr><td><code class="inline">redis</code></td><td>Fast, supports tags/atomic locks — most common production choice</td></tr>
+          <tr><td><code class="inline">memcached</code></td><td>Similar to Redis, simpler feature set</td></tr>
+          <tr><td><code class="inline">database</code></td><td>No extra infra needed, slower than Redis/Memcached</td></tr>
+          <tr><td><code class="inline">file</code></td><td>Local dev default, not suitable for multi-server production</td></tr>
+        </table>
+        <pre><code><span class="tk-class">Cache</span>::<span class="tk-fn">put</span>(<span class="tk-str">'key'</span>, <span class="tk-str">'value'</span>, <span class="tk-num">600</span>);     <span class="tk-com">// store for 600 seconds</span>
+<span class="tk-var">$value</span> = <span class="tk-class">Cache</span>::<span class="tk-fn">get</span>(<span class="tk-str">'key'</span>, <span class="tk-str">'default'</span>);
+
+<span class="tk-com">// remember() — the most-used pattern: get from cache, or compute + cache if missing</span>
+<span class="tk-var">$posts</span> = <span class="tk-class">Cache</span>::<span class="tk-fn">remember</span>(<span class="tk-str">'posts.popular'</span>, <span class="tk-num">3600</span>, <span class="tk-kw">function</span> () {
+    <span class="tk-kw">return</span> <span class="tk-class">Post</span>::<span class="tk-fn">orderBy</span>(<span class="tk-str">'views'</span>, <span class="tk-str">'desc'</span>)->take(<span class="tk-num">10</span>)->get();
+});
+
+<span class="tk-class">Cache</span>::<span class="tk-fn">rememberForever</span>(<span class="tk-str">'site.settings'</span>, <span class="tk-kw">fn</span> () => <span class="tk-class">Setting</span>::<span class="tk-fn">all</span>());
+<span class="tk-class">Cache</span>::<span class="tk-fn">forget</span>(<span class="tk-str">'posts.popular'</span>);  <span class="tk-com">// invalidate manually, e.g. in an Observer when a post changes</span>
+
+<span class="tk-com">// cache tags (Redis/Memcached only) — invalidate a whole group at once:</span>
+<span class="tk-class">Cache</span>::<span class="tk-fn">tags</span>([<span class="tk-str">'posts'</span>])->put(<span class="tk-str">'posts.popular'</span>, <span class="tk-var">$data</span>, <span class="tk-num">3600</span>);
+<span class="tk-class">Cache</span>::<span class="tk-fn">tags</span>([<span class="tk-str">'posts'</span>])->flush(); <span class="tk-com">// clears every key tagged 'posts'</span></code></pre>
+        <div class="tip">See <a href="#large-datasets">Part 2: Large Dataset Handling</a> and <a href="#eager-loading">Eager Loading</a> for query-level performance — caching and query optimization work together, not as substitutes for each other.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="production-caching-commands">
+      <h2 class="concept-title">📦 Production Caching Commands</h2>
+      <div class="concept-body">
+        <p>These cache Laravel's own internals (not your application data) to skip re-parsing files on every request — always run on deploy, never in local dev (changes won't show until you clear them).</p>
+        <pre><code><span class="tk-kw">php</span> artisan config:cache   <span class="tk-com"># combines all config/*.php into one file</span>
+<span class="tk-kw">php</span> artisan route:cache    <span class="tk-com"># compiles routes — closures NOT allowed when cached</span>
+<span class="tk-kw">php</span> artisan view:cache     <span class="tk-com"># precompiles all Blade views</span>
+<span class="tk-kw">php</span> artisan event:cache    <span class="tk-com"># caches auto-discovered event/listener map</span>
+
+<span class="tk-com"># clear all of the above:</span>
+<span class="tk-kw">php</span> artisan optimize:clear</code></pre>
+        <div class="warn"><b>Common gotcha:</b> after running <code class="inline">config:cache</code>, calls to <code class="inline">env()</code> outside of config files stop working (they return null) — always read environment values through <code class="inline">config('app.name')</code> rather than <code class="inline">env('APP_NAME')</code> directly in your application code.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="opcache">
+      <h2 class="concept-title">⚡ OPcache</h2>
+      <div class="concept-body">
+        <p>OPcache is a PHP extension (not Laravel-specific) that caches compiled PHP bytecode in memory, skipping the parse/compile step on every request. It's a server-level setting, not something you toggle from artisan.</p>
+        <pre><code><span class="tk-com">; php.ini</span>
+opcache.enable=1
+opcache.validate_timestamps=0  <span class="tk-com">; production: don't check file mtimes on every request</span>
+opcache.memory_consumption=256</code></pre>
+        <div class="warn"><b>Important:</b> with <code class="inline">validate_timestamps=0</code>, OPcache won't notice file changes after deploy — you must clear it on every deploy via <code class="inline">opcache_reset()</code> or a web server reload.</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 9: PRODUCTION ARCHITECTURE / CODE STRUCTURE -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-9">
+      <span class="part-tag p3">Part 9</span>
+      <h2 class="part-title">Production Architecture &amp; Code Structure</h2>
+      <p class="part-desc">Real projects outgrow "everything in the controller." Services, Actions, Repositories, DTOs, and Pipelines organize business logic so it scales with the codebase.</p>
+    </div>
+
+    <section class="concept" id="service-classes">
+      <h2 class="concept-title">🛎️ Service Classes</h2>
+      <div class="concept-body">
+        <p>A Service extracts business logic out of fat controllers into a dedicated, reusable, testable class — especially useful when the same logic is needed from a controller, a job, AND a console command.</p>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">OrderService</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__construct</span>(<span class="tk-kw">private</span> <span class="tk-class">PaymentGatewayInterface</span> <span class="tk-var">$gateway</span>) {}
+
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">placeOrder</span>(<span class="tk-class">User</span> <span class="tk-var">$user</span>, <span class="tk-class">Cart</span> <span class="tk-var">$cart</span>): <span class="tk-class">Order</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-class">DB</span>::<span class="tk-fn">transaction</span>(<span class="tk-kw">function</span> () <span class="tk-kw">use</span> (<span class="tk-var">$user</span>, <span class="tk-var">$cart</span>) {
+            <span class="tk-var">$order</span> = <span class="tk-class">Order</span>::<span class="tk-fn">create</span>([<span class="tk-str">'user_id'</span> => <span class="tk-var">$user</span>->id, <span class="tk-str">'total'</span> => <span class="tk-var">$cart</span>->total()]);
+            <span class="tk-var">$this</span>->gateway->charge(<span class="tk-var">$user</span>, <span class="tk-var">$cart</span>->total());
+            <span class="tk-kw">return</span> <span class="tk-var">$order</span>;
+        });
+    }
+}
+
+<span class="tk-com">// controller becomes thin:</span>
+<span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">store</span>(<span class="tk-class">Request</span> <span class="tk-var">$request</span>, <span class="tk-class">OrderService</span> <span class="tk-var">$orders</span>) {
+    <span class="tk-var">$order</span> = <span class="tk-var">$orders</span>->placeOrder(<span class="tk-var">$request</span>->user(), <span class="tk-var">$request</span>->user()->cart);
+    <span class="tk-kw">return</span> <span class="tk-fn">redirect</span>()->route(<span class="tk-str">'orders.show'</span>, <span class="tk-var">$order</span>);
+}</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="action-classes">
+      <h2 class="concept-title">⚡ Action Classes</h2>
+      <div class="concept-body">
+        <p>An Action is a stricter version of a Service: <b>one class, one operation</b>, usually one public method (often named <code class="inline">execute()</code> or <code class="inline">handle()</code>). Where Services group related operations together, Actions are deliberately single-purpose — easy to find, easy to test, easy to reuse from anywhere.</p>
+        <pre><code><span class="tk-kw">class</span> <span class="tk-class">CreatePost</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">execute</span>(<span class="tk-class">User</span> <span class="tk-var">$author</span>, <span class="tk-kw">array</span> <span class="tk-var">$data</span>): <span class="tk-class">Post</span>
+    {
+        <span class="tk-var">$post</span> = <span class="tk-var">$author</span>->posts()->create([
+            ...<span class="tk-var">$data</span>,
+            <span class="tk-str">'slug'</span> => <span class="tk-class">Str</span>::<span class="tk-fn">slug</span>(<span class="tk-var">$data</span>[<span class="tk-str">'title'</span>]),
+        ]);
+        <span class="tk-class">PostCreated</span>::<span class="tk-fn">dispatch</span>(<span class="tk-var">$post</span>);
+        <span class="tk-kw">return</span> <span class="tk-var">$post</span>;
+    }
+}
+
+<span class="tk-com">// usage anywhere — controller, command, another action:</span>
+<span class="tk-var">$post</span> = (<span class="tk-kw">new</span> <span class="tk-class">CreatePost</span>)->execute(<span class="tk-var">$user</span>, <span class="tk-var">$request</span>->validated());</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="repository-pattern">
+      <h2 class="concept-title">🗃️ Repository Pattern</h2>
+      <div class="concept-body">
+        <p>A Repository abstracts data access behind an interface, so the rest of your app doesn't know (or care) whether data comes from Eloquent, a third-party API, or a cache. Most useful when you genuinely expect to swap data sources, or want to fully decouple business logic from Eloquent for testing.</p>
+        <pre><code><span class="tk-kw">interface</span> <span class="tk-class">PostRepositoryInterface</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">find</span>(<span class="tk-kw">int</span> <span class="tk-var">$id</span>): ?<span class="tk-class">Post</span>;
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">published</span>(): <span class="tk-class">Collection</span>;
+}
+
+<span class="tk-kw">class</span> <span class="tk-class">EloquentPostRepository</span> <span class="tk-kw">implements</span> <span class="tk-class">PostRepositoryInterface</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">find</span>(<span class="tk-kw">int</span> <span class="tk-var">$id</span>): ?<span class="tk-class">Post</span> { <span class="tk-kw">return</span> <span class="tk-class">Post</span>::<span class="tk-fn">find</span>(<span class="tk-var">$id</span>); }
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">published</span>(): <span class="tk-class">Collection</span> { <span class="tk-kw">return</span> <span class="tk-class">Post</span>::<span class="tk-fn">where</span>(<span class="tk-str">'published'</span>, <span class="tk-kw">true</span>)->get(); }
+}
+<span class="tk-com">// bind the interface to this implementation in a Service Provider (see Part 3: Service Container)</span></code></pre>
+        <div class="warn"><b>Pragmatic note:</b> in most Laravel apps, Eloquent models already act as a reasonable abstraction, and a full Repository layer on top adds indirection without much benefit. It earns its place in larger codebases with multiple data sources or heavy test-isolation needs — not as a default for every project.</div>
+      </div>
+    </section>
+
+    <section class="concept" id="dtos">
+      <h2 class="concept-title">📨 DTOs (Data Transfer Objects)</h2>
+      <div class="concept-body">
+        <p>A DTO is a simple, typed object that carries data between layers — instead of passing loose arrays (where typos in keys fail silently) between a controller, service, and job.</p>
+        <pre><code><span class="tk-kw">final</span> <span class="tk-kw">class</span> <span class="tk-class">CreatePostData</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">__construct</span>(
+        <span class="tk-kw">public</span> <span class="tk-kw">readonly</span> <span class="tk-kw">string</span> <span class="tk-var">$title</span>,
+        <span class="tk-kw">public</span> <span class="tk-kw">readonly</span> <span class="tk-kw">string</span> <span class="tk-var">$body</span>,
+        <span class="tk-kw">public</span> <span class="tk-kw">readonly</span> <span class="tk-kw">?int</span> <span class="tk-var">$categoryId</span> = <span class="tk-kw">null</span>,
+    ) {}
+
+    <span class="tk-kw">public</span> <span class="tk-kw">static</span> <span class="tk-kw">function</span> <span class="tk-fn">fromRequest</span>(<span class="tk-class">StorePostRequest</span> <span class="tk-var">$request</span>): <span class="tk-kw">self</span>
+    {
+        <span class="tk-kw">return</span> <span class="tk-kw">new</span> <span class="tk-kw">self</span>(...<span class="tk-var">$request</span>->validated());
+    }
+}
+<span class="tk-com">// now CreatePost::execute() can type-hint CreatePostData instead of a loose array —</span>
+<span class="tk-com">// typos become IDE/static-analysis errors instead of silent runtime bugs</span></code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="pipeline-facade">
+      <h2 class="concept-title">🔧 Pipelines (Pipeline Facade)</h2>
+      <div class="concept-body">
+        <p>The Pipeline facade runs an object through a series of "pipes" (classes), each able to inspect/modify it before passing it along — the exact same pattern middleware uses internally, available for your own use cases.</p>
+        <pre><code><span class="tk-var">$user</span> = <span class="tk-class">Pipeline</span>::<span class="tk-fn">send</span>(<span class="tk-var">$user</span>)
+    ->through([
+        <span class="tk-class">VerifyEmailDomain</span>::<span class="tk-kw">class</span>,
+        <span class="tk-class">ApplyDefaultRole</span>::<span class="tk-kw">class</span>,
+        <span class="tk-class">SendWelcomeEmail</span>::<span class="tk-kw">class</span>,
+    ])
+    ->then(<span class="tk-kw">fn</span> (<span class="tk-class">User</span> <span class="tk-var">$user</span>) => <span class="tk-var">$user</span>);
+
+<span class="tk-com">// each pipe class:</span>
+<span class="tk-kw">class</span> <span class="tk-class">ApplyDefaultRole</span>
+{
+    <span class="tk-kw">public</span> <span class="tk-kw">function</span> <span class="tk-fn">handle</span>(<span class="tk-class">User</span> <span class="tk-var">$user</span>, <span class="tk-class">Closure</span> <span class="tk-var">$next</span>)
+    {
+        <span class="tk-var">$user</span>->assignRole(<span class="tk-str">'member'</span>);
+        <span class="tk-kw">return</span> <span class="tk-var">$next</span>(<span class="tk-var">$user</span>);
+    }
+}</code></pre>
+        <div class="tip"><b>When to reach for this:</b> a fixed sequence of independent transformation steps on one object — e.g. a multi-stage signup process, or building a complex search query from several optional filters.</div>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- PART 10: DEVOPS / DEPLOYMENT -->
+    <!-- ============================================================ -->
+    <div class="part-divider" id="part-10">
+      <span class="part-tag p4">Part 10</span>
+      <h2 class="part-title">DevOps &amp; Deployment</h2>
+      <p class="part-desc">Environment config, essential Artisan commands, task scheduling, and a practical production deployment checklist.</p>
+    </div>
+
+    <section class="concept" id="env-config-best-practices">
+      <h2 class="concept-title">🌍 Environment Configuration</h2>
+      <div class="concept-body">
+        <pre><code><span class="tk-com"># .env — NEVER commit this file (add to .gitignore)</span>
+APP_ENV=production
+APP_DEBUG=false        <span class="tk-com"># CRITICAL: true in production leaks stack traces to visitors</span>
+APP_KEY=base64:...     <span class="tk-com"># generated via: php artisan key:generate</span>
+DB_CONNECTION=mysql
+QUEUE_CONNECTION=redis
+CACHE_STORE=redis</code></pre>
+        <div class="warn"><b>Security basics:</b> <code class="inline">APP_DEBUG=true</code> on a live site will display full stack traces (including env values) to any visitor who triggers an error. Always <code class="inline">false</code> in production. Commit a <code class="inline">.env.example</code> with dummy values instead of the real <code class="inline">.env</code>.</div>
+        <p>Always read config via <code class="inline">config('app.name')</code> in application code, not <code class="inline">env('APP_NAME')</code> directly — once <code class="inline">config:cache</code> runs, raw <code class="inline">env()</code> calls outside config files return null.</p>
+      </div>
+    </section>
+
+    <section class="concept" id="artisan-commands">
+      <h2 class="concept-title">⌨️ Essential Artisan Commands</h2>
+      <div class="concept-body">
+        <table class="ref-table">
+          <tr><th>Command</th><th>Purpose</th></tr>
+          <tr><td><code class="inline">php artisan make:model/controller/migration/job/...</code></td><td>Generate boilerplate files</td></tr>
+          <tr><td><code class="inline">php artisan migrate / migrate:rollback / migrate:fresh</code></td><td>Schema management</td></tr>
+          <tr><td><code class="inline">php artisan tinker</code></td><td>Interactive REPL — test Eloquent queries live</td></tr>
+          <tr><td><code class="inline">php artisan route:list</code></td><td>See every registered route</td></tr>
+          <tr><td><code class="inline">php artisan queue:work / queue:restart</code></td><td>Run / restart queue workers</td></tr>
+          <tr><td><code class="inline">php artisan config:cache / route:cache / view:cache</code></td><td>Production performance caching (see Part 8)</td></tr>
+          <tr><td><code class="inline">php artisan optimize / optimize:clear</code></td><td>Run all caching commands at once / clear them all</td></tr>
+          <tr><td><code class="inline">php artisan make:command SendInvoices</code></td><td>Custom Artisan command</td></tr>
+          <tr><td><code class="inline">php artisan storage:link</code></td><td>Symlinks <code class="inline">public/storage</code> → <code class="inline">storage/app/public</code> for public file access</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section class="concept" id="task-scheduling">
+      <h2 class="concept-title">⏰ Task Scheduling</h2>
+      <div class="concept-body">
+        <p>Instead of juggling dozens of cron entries, Laravel lets you define all scheduled tasks in PHP, then point cron at a single command.</p>
+        <div class="code-label">Laravel 11+ — bootstrap/app.php</div>
+        <pre><code>-><span class="tk-fn">withSchedule</span>(<span class="tk-kw">function</span> (<span class="tk-class">Schedule</span> <span class="tk-var">$schedule</span>) {
+    <span class="tk-var">$schedule</span>->command(<span class="tk-str">'reports:daily'</span>)->dailyAt(<span class="tk-str">'01:00'</span>);
+    <span class="tk-var">$schedule</span>->job(<span class="tk-kw">new</span> <span class="tk-class">CleanupOldFiles</span>)->weekly();
+})</code></pre>
+        <div class="version-note"><b>Laravel 8–10:</b> the same code lived in <code class="inline">app/Console/Kernel.php</code>'s <code class="inline">schedule()</code> method instead of <code class="inline">bootstrap/app.php</code>.</div>
+        <div class="code-label">The one cron entry needed on the server (all versions)</div>
+        <pre><code><span class="tk-com"># crontab -e</span>
+* * * * * cd /path-to-app && php artisan schedule:run >> /dev/null 2>&1</code></pre>
+      </div>
+    </section>
+
+    <section class="concept" id="deployment-checklist">
+      <h2 class="concept-title">✅ Production Deployment Checklist</h2>
+      <div class="concept-body">
+        <ol>
+          <li><code class="inline">composer install --optimize-autoloader --no-dev</code> — skip dev dependencies, optimize the class autoloader</li>
+          <li><code class="inline">php artisan migrate --force</code> — run pending migrations (<code class="inline">--force</code> needed since <code class="inline">APP_ENV=production</code> normally prompts for confirmation)</li>
+          <li><code class="inline">php artisan config:cache</code>, <code class="inline">route:cache</code>, <code class="inline">view:cache</code> (or simply <code class="inline">php artisan optimize</code>)</li>
+          <li><code class="inline">php artisan queue:restart</code> — so workers load the newly deployed code</li>
+          <li>Confirm <code class="inline">APP_DEBUG=false</code> and <code class="inline">APP_ENV=production</code> in <code class="inline">.env</code></li>
+          <li>Reload PHP-FPM / clear OPcache so cached bytecode reflects the new deploy</li>
+          <li>Run <code class="inline">npm run build</code> for frontend assets if the app uses Vite/Mix</li>
+        </ol>
+        <h3 class="sub-title">Zero-downtime deploys (concept)</h3>
+        <p>The core idea: build the new release in a fresh directory, run migrations and caching against it, then atomically switch a symlink (e.g. <code class="inline">current</code>) to point at the new release directory — so there's no window where old code and a half-finished new deploy are both live. Tools like <b>Laravel Forge</b>, <b>Deployer</b>, or Envoyer automate this pattern; it's also exactly how most container-orchestrated (Docker/Kubernetes) deploys work at a higher level.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="toc-jump" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑</div>
+
+<script>
+/* ============ NAV DATA — built up as parts are added ============ */
+const navData = [
+  { id:'part-1', title:'Part 1 — Foundations', sections:[
+    {id:'request-lifecycle', title:'Request Lifecycle'},
+    {id:'installation-structure', title:'Installation & Structure'},
+    {id:'routing', title:'Routing'},
+    {id:'middleware', title:'Middleware'},
+    {id:'controllers', title:'Controllers'},
+    {id:'requests-responses', title:'Requests & Responses'},
+    {id:'blade', title:'Blade Templating'},
+    {id:'validation', title:'Validation'},
+  ]},
+  { id:'part-2', title:'Part 2 — Database & Eloquent', sections:[
+    {id:'migrations', title:'Migrations'},
+    {id:'seeders-factories', title:'Seeders & Factories'},
+    {id:'query-builder', title:'Query Builder'},
+    {id:'eloquent-basics', title:'Eloquent Basics'},
+    {id:'relationships', title:'Relationships (All Types)'},
+    {id:'eager-loading', title:'Eager Loading & N+1'},
+    {id:'collections', title:'Collections'},
+    {id:'accessors-mutators-casts', title:'Accessors, Mutators & Casts'},
+    {id:'scopes', title:'Query Scopes'},
+    {id:'model-events-observers', title:'Model Events & Observers'},
+    {id:'pagination', title:'Pagination'},
+    {id:'large-datasets', title:'Large Dataset Handling'},
+    {id:'transactions', title:'Transactions'},
+  ]},
+  { id:'part-3', title:'Part 3 — Core Architecture', sections:[
+    {id:'service-container', title:'Service Container'},
+    {id:'service-providers', title:'Service Providers'},
+    {id:'facades', title:'Facades'},
+  ]},
+  { id:'part-4', title:'Part 4 — Auth & Authorization', sections:[
+    {id:'auth-scaffolding', title:'Auth Scaffolding Options'},
+    {id:'guards-providers', title:'Guards & Providers'},
+    {id:'sanctum', title:'Sanctum (API & SPA)'},
+    {id:'gates', title:'Gates'},
+    {id:'policies', title:'Policies'},
+  ]},
+  { id:'part-5', title:'Part 5 — Queues, Jobs & Events', sections:[
+    {id:'jobs', title:'Jobs & Dispatching'},
+    {id:'queue-drivers-workers', title:'Queue Drivers & Workers'},
+    {id:'failed-jobs', title:'Failed Jobs & Retries'},
+    {id:'events-listeners', title:'Events & Listeners'},
+  ]},
+  { id:'part-6', title:'Part 6 — API Development', sections:[
+    {id:'api-resources', title:'API Resources'},
+    {id:'api-versioning', title:'API Versioning'},
+    {id:'api-error-handling', title:'API Error Handling'},
+  ]},
+  { id:'part-7', title:'Part 7 — Testing', sections:[
+    {id:'testing-setup', title:'PHPUnit vs Pest'},
+    {id:'http-testing', title:'HTTP Testing Helpers'},
+    {id:'database-testing', title:'Database Testing'},
+    {id:'mocking', title:'Mocking'},
+  ]},
+  { id:'part-8', title:'Part 8 — Performance', sections:[
+    {id:'caching', title:'Caching'},
+    {id:'production-caching-commands', title:'Production Caching Commands'},
+    {id:'opcache', title:'OPcache'},
+  ]},
+  { id:'part-9', title:'Part 9 — Production Architecture', sections:[
+    {id:'service-classes', title:'Service Classes'},
+    {id:'action-classes', title:'Action Classes'},
+    {id:'repository-pattern', title:'Repository Pattern'},
+    {id:'dtos', title:'DTOs'},
+    {id:'pipeline-facade', title:'Pipelines (Pipeline Facade)'},
+  ]},
+  { id:'part-10', title:'Part 10 — DevOps & Deployment', sections:[
+    {id:'env-config-best-practices', title:'Environment Configuration'},
+    {id:'artisan-commands', title:'Essential Artisan Commands'},
+    {id:'task-scheduling', title:'Task Scheduling'},
+    {id:'deployment-checklist', title:'Production Deployment Checklist'},
+  ]},
+];
+
+function renderNav(){
+  const tree = document.getElementById('navTree');
+  tree.innerHTML = navData.map((part, i) => `
+    <div class="nav-part ${i===0?'open':''}" data-part="${part.id}">
+      <div class="nav-part-title" onclick="togglePart(this)">
+        <span>${part.title}</span><span class="chev">▶</span>
+      </div>
+      <div class="nav-sections">
+        ${part.sections.map(s => `<a href="#${s.id}" data-target="${s.id}">${s.title}</a>`).join('')}
+      </div>
+    </div>
+  `).join('');
+}
+function togglePart(el){
+  el.parentElement.classList.toggle('open');
+}
+renderNav();
+
+/* ============ SEARCH ============ */
+const searchIndex = [];
+navData.forEach(part => part.sections.forEach(s => searchIndex.push({id:s.id, title:s.title, part:part.title})));
+
+const searchInput = document.getElementById('searchInput');
+const searchResults = document.getElementById('searchResults');
+searchInput.addEventListener('input', function(){
+  const q = this.value.trim().toLowerCase();
+  if(!q){ searchResults.style.display='none'; searchResults.innerHTML=''; return; }
+  const matches = searchIndex.filter(item => item.title.toLowerCase().includes(q));
+  if(matches.length === 0){
+    searchResults.innerHTML = '<a style="color:#6b7785">No results</a>';
+  } else {
+    searchResults.innerHTML = matches.slice(0,12).map(m => {
+      const idx = m.title.toLowerCase().indexOf(q);
+      const highlighted = m.title.slice(0,idx) + '<b>' + m.title.slice(idx, idx+q.length) + '</b>' + m.title.slice(idx+q.length);
+      return `<a href="#${m.id}" data-target="${m.id}">${highlighted}<br><span style="color:#6b7785;font-size:10.5px">${m.part}</span></a>`;
+    }).join('');
+  }
+  searchResults.style.display = 'block';
+});
+
+/* click handling for nav links + search results: scroll, open parent, highlight */
+document.addEventListener('click', function(e){
+  const a = e.target.closest('a[data-target]');
+  if(!a) return;
+  e.preventDefault();
+  const id = a.getAttribute('data-target');
+  const el = document.getElementById(id);
+  if(el){
+    // open the containing part if collapsed
+    const part = el.closest('section') ? document.querySelector(`.nav-part .nav-sections a[data-target="${id}"]`) : null;
+    document.querySelectorAll('.nav-part').forEach(p => {
+      if(p.querySelector(`a[data-target="${id}"]`)) p.classList.add('open');
+    });
+    el.scrollIntoView({behavior:'smooth', block:'start'});
+    history.replaceState(null, '', '#'+id);
+  }
+  searchInput.value=''; searchResults.style.display='none'; searchResults.innerHTML='';
+  if(window.innerWidth <= 880) document.getElementById('sidebar').classList.remove('mobile-open');
+});
+
+/* ============ SCROLLSPY — highlight active section in sidebar ============ */
+const allSections = () => Array.from(document.querySelectorAll('section.concept'));
+function updateActive(){
+  const sections = allSections();
+  let activeId = null;
+  const scrollPos = window.scrollY + 100;
+  for(const sec of sections){
+    if(sec.offsetTop <= scrollPos) activeId = sec.id;
+  }
+  document.querySelectorAll('.nav-sections a').forEach(a => {
+    a.classList.toggle('active', a.getAttribute('data-target') === activeId);
+  });
+  // progress bar
+  const doc = document.documentElement;
+  const pct = (window.scrollY) / (doc.scrollHeight - window.innerHeight) * 100;
+  document.getElementById('topProgress').style.width = Math.min(pct,100) + '%';
+}
+window.addEventListener('scroll', updateActive);
+window.addEventListener('load', updateActive);
+
+/* ============ MOBILE TOGGLE ============ */
+document.getElementById('mobileToggle').addEventListener('click', function(){
+  document.getElementById('sidebar').classList.toggle('mobile-open');
+});
+</script>
+
+</body>
+</html>

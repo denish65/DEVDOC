@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>React Project Builder (For Backend Devs)</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { 
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+      background: #0f172a; 
+      padding: 24px; 
+      color: #e2e8f0;
+    }
+    .wrap { max-width: 1000px; margin: 0 auto; }
+
+    .header {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 28px 32px;
+      margin-bottom: 30px;
+      box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+    }
+    .header h1 { font-size: 28px; font-weight: 700; color: #38bdf8; }
+    .header p { color: #94a3b8; margin-top: 8px; font-size: 16px; max-width: 700px; }
+    .header .highlight { background: #1e293b; padding: 4px 12px; border-radius: 20px; border: 1px solid #334155; font-size: 14px; display: inline-block; margin-top: 12px; }
+    .header .highlight strong { color: #facc15; }
+
+    .sprint {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .sprint:hover { border-color: #475569; }
+
+    .sprint-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      cursor: pointer;
+      background: #0f172a;
+      border-bottom: 1px solid transparent;
+      transition: background .2s;
+    }
+    .sprint-header:hover { background: #1e293b; }
+    .sprint-num {
+      background: #38bdf8;
+      color: #0f172a;
+      font-weight: 800;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .sprint-title { font-weight: 600; font-size: 17px; flex: 1; color: #f1f5f9; }
+    .sprint-sub { font-size: 13px; color: #94a3b8; }
+    .chevron { transition: transform .25s; color: #64748b; font-size: 12px; }
+    .chevron.open { transform: rotate(180deg); }
+
+    .sprint-body {
+      display: none;
+      padding: 0 20px 22px;
+      border-top: 1px solid #334155;
+    }
+    .sprint-body.open { display: block; }
+
+    .sprint-goal {
+      background: #0f172a;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin: 16px 0 14px;
+      border-left: 4px solid #facc15;
+      font-size: 14px;
+      color: #cbd5e1;
+    }
+    .sprint-goal strong { color: #facc15; }
+
+    .task-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 550px) { .task-grid { grid-template-columns: 1fr; } }
+
+    .task-card {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 10px;
+      padding: 14px 16px;
+      transition: border-color .2s, transform .1s;
+    }
+    .task-card:hover { border-color: #38bdf8; }
+    .task-name { font-weight: 600; font-size: 14px; color: #f8fafc; }
+    .task-desc { font-size: 13px; color: #94a3b8; margin-top: 4px; }
+    .task-react { 
+      font-size: 11px; 
+      background: #1e293b; 
+      color: #38bdf8; 
+      padding: 2px 10px; 
+      border-radius: 12px; 
+      display: inline-block; 
+      margin-top: 8px;
+      border: 1px solid #1e3a5f;
+      font-weight: 500;
+    }
+
+    .pitfall {
+      background: #2d1b1b;
+      border: 1px solid #7f1d1d;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #fca5a5;
+    }
+    .pitfall strong { color: #f87171; }
+
+    .resource-box {
+      margin-top: 16px;
+      background: #0f172a;
+      border-radius: 10px;
+      padding: 10px 14px;
+      border: 1px solid #334155;
+    }
+    .resource-box .label { font-size: 11px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: .05em; }
+    .resource-list { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 4px; }
+    .resource-item { font-size: 13px; color: #38bdf8; cursor: pointer; }
+    .resource-item:hover { text-decoration: underline; }
+
+    .footer { margin-top: 30px; text-align: center; font-size: 14px; color: #64748b; border-top: 1px solid #334155; padding-top: 22px; }
+    .footer strong { color: #facc15; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>⚛️ React Project Builder (MERN without the "M")</h1>
+    <p>You already have a Node/Express/MySQL/AI API. Now build a full React frontend for it.<br> 
+    <span style="color: #facc15;">No isolated counters.</span> Just real features that connect to your backend.</p>
+    <span class="highlight"><strong>Your Backend:</strong> Node + Express + MySQL (AI endpoints already built)</span>
+  </div>
+
+  <div id="sprintsContainer"></div>
+
+  <div class="footer">
+    <strong>Stop watching tutorials.</strong> Open your code editor and build these sprints one by one.<br>
+    By Sprint 6, you will have a fully functional React app talking to your existing API.
+  </div>
+</div>
+
+<script>
+const sprints = [
+  {
+    title: "Sprint 1: Connect React to your API",
+    subtitle: "The 'Hello World' of MERN",
+    goal: "Your React app successfully fetches a list of items (e.g., Users or Tasks) from your existing Node/MySQL API and displays them on the screen.",
+    tasks: [
+      { name: "Initialize React (Vite) in a 'frontend' folder", desc: "Keep backend separate. Install Axios.", react: "Vite + React setup" },
+      { name: "Create an API service file (api.js)", desc: "Base URL, axios instance with interceptors.", react: "Axios instance" },
+      { name: "Fetch data using useEffect + useState", desc: "GET /api/users or /api/tasks. Store in state.", react: "useEffect, useState" },
+      { name: "Display data with .map()", desc: "Render a list of names/emails in a simple div.", react: "JSX rendering" },
+    ],
+    pitfall: "CORS error! Make sure your Express backend has cors() middleware enabled, and your axios baseURL points to http://localhost:5000.",
+    resources: [
+      { label: "Vite + React Setup", url: "https://vitejs.dev/guide/" },
+      { label: "Axios Docs", url: "https://axios-http.com/docs/intro" },
+      { label: "React useEffect", url: "https://react.dev/reference/react/useEffect" },
+    ]
+  },
+  {
+    title: "Sprint 2: Build Reusable Components",
+    subtitle: "Breaking the UI into pieces",
+    goal: "Instead of one giant page, split your UI into components (Navbar, Sidebar, Table, Card). Pass data down via Props.",
+    tasks: [
+      { name: "Create a Layout component (Header + Main)", desc: "Wrap your pages with a shared layout.", react: "Component composition" },
+      { name: "Create a Card/ListItem component", desc: "Receive 'item' as a prop and display it.", react: "Props (properties)" },
+      { name: "Create a LoadingSpinner component", desc: "Show while data is being fetched.", react: "Conditional rendering" },
+      { name: "Create an ErrorMessage component", desc: "Display if the API fails.", react: "Props for message" },
+    ],
+    pitfall: "Prop Drilling! If you pass props down 3 levels, consider moving state up to the parent or using Context later.",
+    resources: [
+      { label: "Passing Props", url: "https://react.dev/learn/passing-props-to-a-component" },
+      { label: "Conditional Rendering", url: "https://react.dev/learn/conditional-rendering" },
+    ]
+  },
+  {
+    title: "Sprint 3: Forms & Adding Data (POST)",
+    subtitle: "Sending data back to your API",
+    goal: "Build a form that sends a POST request to your Node/MySQL API to create a new record (e.g., a new Task or User).",
+    tasks: [
+      { name: "Build a Form component with inputs", desc: "Use useState for each input field (controlled components).", react: "Controlled inputs" },
+      { name: "Handle form submit (onSubmit)", desc: "Prevent default, send POST request via axios.", react: "Event handlers" },
+      { name: "Show success/error feedback", desc: "Display a toast or alert on successful creation.", react: "State updates" },
+      { name: "Refetch the list after adding", desc: "Call your GET function again to update the UI.", react: "Dependency array / refetch pattern" },
+    ],
+    pitfall: "Forgetting to set the 'Content-Type' header. Make sure axios sends application/json, or use FormData if uploading files.",
+    resources: [
+      { label: "React Forms", url: "https://react.dev/reference/react-dom/components/input" },
+      { label: "Axios POST", url: "https://axios-http.com/docs/post_example" },
+    ]
+  },
+  {
+    title: "Sprint 4: Routing & Navigation (React Router)",
+    subtitle: "Multi-page feeling in a Single Page App",
+    goal: "Add a navigation bar that lets you switch between 'Dashboard', 'List', and 'Add Item' without reloading the page.",
+    tasks: [
+      { name: "Install React Router DOM", desc: "Set up BrowserRouter in main.jsx.", react: "Router provider" },
+      { name: "Define Routes (/, /list, /add, /edit/:id)", desc: "Use <Route> and <Routes> components.", react: "Route definition" },
+      { name: "Create a Navbar with <Link> components", desc: "Navigate between pages.", react: "Declarative navigation" },
+      { name: "Use useParams to get ID for editing", desc: "Fetch a single item based on the URL ID.", react: "useParams hook" },
+    ],
+    pitfall: "Forgetting to wrap your app in <BrowserRouter>. Also, ensure your server handles fallback routes for SPA (or use HashRouter for simplicity).",
+    resources: [
+      { label: "React Router v6", url: "https://reactrouter.com/en/main/start/tutorial" },
+      { label: "useParams hook", url: "https://reactrouter.com/en/main/hooks/use-params" },
+    ]
+  },
+  {
+    title: "Sprint 5: Global State (Context API)",
+    subtitle: "Sharing Auth/User data everywhere",
+    goal: "Since you already have Login/Register on your backend, store the logged-in user's data and JWT token globally so every component knows who is logged in.",
+    tasks: [
+      { name: "Create AuthContext using createContext", desc: "Store user, token, login, logout functions.", react: "Context API" },
+      { name: "Wrap your App in AuthProvider", desc: "Make context available to all components.", react: "Provider pattern" },
+      { name: "Use useContext in Navbar/Pages", desc: "Show 'Welcome User' or hide buttons based on auth.", react: "useContext hook" },
+      { name: "Protect routes (PrivateRoute wrapper)", desc: "Redirect to login if no user is present.", react: "Protected routes" },
+    ],
+    pitfall: "Context re-renders everything when it changes. For large apps, use Zustand or Redux, but Context is perfect for Auth/JWT in your first project.",
+    resources: [
+      { label: "React Context", url: "https://react.dev/learn/passing-data-deeply-with-context" },
+      { label: "Protected Routes", url: "https://reactrouter.com/en/main/example/auth" },
+    ]
+  },
+  {
+    title: "Sprint 6: Custom Hooks & Your AI Integration",
+    subtitle: "The 'Level 2' you actually need",
+    goal: "Since you already have AI endpoints (Hugging Face / Gemini), build a dedicated page that sends prompts to your backend and streams/displays the AI response beautifully in React.",
+    tasks: [
+      { name: "Create a custom hook: useAI", desc: "Encapsulate the logic for sending prompt + handling loading/error.", react: "Custom Hooks" },
+      { name: "Build a Chat-like UI", desc: "Display user messages on the right, AI responses on the left.", react: "Flex layout, map over messages" },
+      { name: "Add a 'Regenerate' button", desc: "Resend the same prompt to the API.", react: "Callback functions" },
+      { name: "Memoize expensive components (React.memo)", desc: "Stop the AI response component from re-rendering unnecessarily.", react: "React.memo, useCallback" },
+    ],
+    pitfall: "Your AI response might take 5+ seconds. Make sure you show a loading spinner and disable the button while waiting to prevent double submission.",
+    resources: [
+      { label: "Custom Hooks", url: "https://react.dev/learn/reusing-logic-with-custom-hooks" },
+      { label: "React.memo", url: "https://react.dev/reference/react/memo" },
+    ]
+  }
+];
+
+const container = document.getElementById('sprintsContainer');
+
+sprints.forEach((sprint, i) => {
+  const el = document.createElement('div');
+  el.className = 'sprint';
+  el.innerHTML = `
+    <div class="sprint-header" onclick="toggleSprint(${i})">
+      <span class="sprint-num">${i+1}</span>
+      <span class="sprint-title">${sprint.title}</span>
+      <span class="sprint-sub">${sprint.subtitle}</span>
+      <span class="chevron" id="chevSprint${i}">▼</span>
+    </div>
+    <div class="sprint-body" id="bodySprint${i}">
+      <div class="sprint-goal"><strong>🎯 Goal:</strong> ${sprint.goal}</div>
+      <div class="task-grid">
+        ${sprint.tasks.map(t => `
+          <div class="task-card">
+            <div class="task-name">${t.name}</div>
+            <div class="task-desc">${t.desc}</div>
+            <span class="task-react">⚛️ ${t.react}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="pitfall"><strong>⚠️ Watch out:</strong> ${sprint.pitfall}</div>
+      <div class="resource-box">
+        <div class="label">📚 React Docs for this Sprint</div>
+        <div class="resource-list">
+          ${sprint.resources.map(r => `<span class="resource-item" onclick="window.open('${r.url}', '_blank')">→ ${r.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+function toggleSprint(i) {
+  const body = document.getElementById('bodySprint'+i);
+  const chev = document.getElementById('chevSprint'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+// Open first 3 by default to give them a head start
+toggleSprint(0);
+toggleSprint(1);
+toggleSprint(2);
+</script>
+</body>
+</html>

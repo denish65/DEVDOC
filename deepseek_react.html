@@ -1,0 +1,496 @@
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; background: var(--bg-body); color: var(--text-primary); padding: 20px; }
+  .wrap { max-width: 960px; margin: 0 auto; }
+
+  :root {
+    --bg-body: #f8f9fc;
+    --bg-card: #ffffff;
+    --bg-secondary: #f1f3f7;
+    --bg-tertiary: #e9ecf2;
+    --border-color: #dce0e8;
+    --text-primary: #1a1d24;
+    --text-secondary: #4a4f5e;
+    --text-tertiary: #7a8094;
+    --text-info: #1e6f9f;
+    --shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-body: #111318;
+      --bg-card: #1a1d26;
+      --bg-secondary: #222631;
+      --bg-tertiary: #2a2f3c;
+      --border-color: #333a4a;
+      --text-primary: #eaeef5;
+      --text-secondary: #b0b8cc;
+      --text-tertiary: #7a84a0;
+      --text-info: #7bb9e6;
+      --shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+  }
+
+  .intro {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-secondary);
+    padding: 16px 20px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    border-left: 4px solid #61dafb;
+    margin-bottom: 24px;
+  }
+  .intro strong { color: var(--text-primary); }
+
+  .stage {
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+    transition: border-color .2s;
+  }
+  .stage:hover { border-color: #8a9bb5; }
+
+  .stage-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--bg-secondary);
+    transition: background .2s;
+    flex-wrap: wrap;
+  }
+  .stage-header:hover { background: var(--bg-tertiary); }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+  }
+  .stage-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    min-width: 120px;
+  }
+  .stage-sub {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    margin-left: auto;
+    margin-right: 6px;
+    white-space: nowrap;
+  }
+  .chevron {
+    font-size: 12px;
+    color: var(--text-tertiary);
+    transition: transform .25s;
+    margin-left: 2px;
+  }
+  .chevron.open { transform: rotate(180deg); }
+
+  .stage-body {
+    display: none;
+    padding: 14px 18px 20px;
+    border-top: 1px solid var(--border-color);
+  }
+  .stage-body.open { display: block; }
+
+  .stage-desc {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+  .stage-desc .project-highlight {
+    display: inline-block;
+    background: var(--bg-tertiary);
+    padding: 0 8px;
+    border-radius: 4px;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .skills-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  @media (max-width: 540px) { .skills-grid { grid-template-columns: 1fr; } }
+
+  .skill-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .skill-card:hover {
+    border-color: #6b8bb0;
+    background: var(--bg-tertiary);
+  }
+  .skill-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+  }
+  .skill-desc {
+    font-size: 11px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .resource-box {
+    margin-top: 16px;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+  }
+  .resource-title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-tertiary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+  }
+  .resource-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+  }
+  .resource-item {
+    font-size: 12px;
+    color: var(--text-info);
+    cursor: pointer;
+    transition: opacity .15s;
+  }
+  .resource-item:hover { opacity: .7; text-decoration: underline; }
+
+  /* React-inspired badge colours */
+  .b1 { background: #d4edda; color: #0e5e2b; }
+  .b2 { background: #cce5ff; color: #004085; }
+  .b3 { background: #ffe5cc; color: #8a4b0a; }
+  .b4 { background: #e2d9f5; color: #4a2d8a; }
+  .b5 { background: #f8d7da; color: #8b1a2b; }
+  .b6 { background: #d1ecf1; color: #0c5460; }
+  .b7 { background: #fff3cd; color: #6d5a0a; }
+  .b8 { background: #d6d8db; color: #383d42; }
+  .b9 { background: #cff4fc; color: #055160; }
+  .b10 { background: #e7d9f0; color: #5a2d7a; }
+
+  @media (prefers-color-scheme: dark) {
+    .b1 { background: #1a4a2a; color: #8fd4a0; }
+    .b2 { background: #1a3a6a; color: #9ac2f0; }
+    .b3 { background: #5a3a0a; color: #f5c78a; }
+    .b4 { background: #3a2a6a; color: #c8baf0; }
+    .b5 { background: #5a1a2a; color: #f0aab0; }
+    .b6 { background: #1a4a5a; color: #8ad0e0; }
+    .b7 { background: #5a4a0a; color: #f5dc8a; }
+    .b8 { background: #2a2a2a; color: #b0b0b0; }
+    .b9 { background: #1a4a5a; color: #8ad0e0; }
+    .b10 { background: #3a2a5a; color: #c8baf0; }
+  }
+
+  .footer-note {
+    margin-top: 24px;
+    font-size: 12px;
+    color: var(--text-tertiary);
+    text-align: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+  }
+  .footer-note a { color: var(--text-info); text-decoration: none; }
+  .footer-note a:hover { text-decoration: underline; }
+</style>
+
+<div class="wrap">
+  <div class="intro">
+    <strong>⚛️ Deep React Roadmap — Production‑Ready Essentials</strong><br>
+    This is not a beginner tutorial. You’ll dive into advanced component patterns, performance optimizations, state management, testing, and full‑stack with Next.js. Every stage includes a <strong>real‑world mini‑project</strong> and clickable skills for deeper dives.
+  </div>
+
+  <div id="stages"></div>
+
+  <div class="footer-note">
+    🚀 Click any skill card to search for in‑depth explanations & code examples.<br>
+    Each resource is a direct link to official docs or top‑tier guides.
+  </div>
+</div>
+
+<script>
+const stages = [
+  {
+    num: "01",
+    title: "React Core & JSX",
+    badge: "b1",
+    label: "Fundamentals",
+    sub: "Project: Todo List",
+    desc: `<span class="project-highlight">📝 Build a functional Todo List</span> — master JSX, components, props, and state. Understand the virtual DOM and reconciliation.`,
+    skills: [
+      { name: "JSX – syntax & expressions", desc: "Embedding JavaScript, conditional rendering, lists" },
+      { name: "Functional components vs class components", desc: "Modern React uses functions + hooks" },
+      { name: "Props & PropTypes / TypeScript", desc: "Passing data, default props, type checking" },
+      { name: "State with useState", desc: "Managing local component state" },
+      { name: "Event handling (onClick, onChange, etc.)", desc: "Synthetic events and binding" },
+      { name: "React DevTools – profiling & inspection", desc: "Debugging and performance analysis" },
+    ],
+    resources: [
+      { label: "React Docs – Main Concepts", url: "https://react.dev/learn" },
+      { label: "JSX in Depth", url: "https://react.dev/learn/writing-markup-with-jsx" },
+      { label: "React DevTools", url: "https://react.dev/learn/react-developer-tools" },
+    ]
+  },
+  {
+    num: "02",
+    title: "Hooks Deep Dive",
+    badge: "b2",
+    label: "Hooks API",
+    sub: "Project: Custom hooks library",
+    desc: `<span class="project-highlight">🧩 Create a set of custom hooks</span> — useReducer, useContext, useEffect, useMemo, useCallback, and build your own reusable hooks.`,
+    skills: [
+      { name: "useEffect – lifecycle & side effects", desc: "Dependency array, cleanup, fetch data" },
+      { name: "useContext – avoid prop drilling", desc: "Global state without third-party libraries" },
+      { name: "useReducer – for complex state logic", desc: "Like Redux but built-in" },
+      { name: "useMemo & useCallback", desc: "Memoization for performance" },
+      { name: "useRef & useImperativeHandle", desc: "Access DOM nodes and imperative APIs" },
+      { name: "Custom Hooks – composition & reusability", desc: "Encapsulate logic, share across components" },
+    ],
+    resources: [
+      { label: "React Hooks API Reference", url: "https://react.dev/reference/react" },
+      { label: "useEffect – complete guide", url: "https://overreacted.io/a-complete-guide-to-useeffect/" },
+      { label: "Custom Hooks examples", url: "https://usehooks.com/" },
+    ]
+  },
+  {
+    num: "03",
+    title: "Advanced Component Patterns",
+    badge: "b3",
+    label: "Design Patterns",
+    sub: "Project: Compound UI components",
+    desc: `<span class="project-highlight">🧱 Build a reusable accordion / dropdown</span> — apply compound components, higher‑order components, render props, and context providers.`,
+    skills: [
+      { name: "Compound components", desc: "Shared state via context, flexible APIs (e.g., Tabs, Accordion)" },
+      { name: "Higher‑Order Components (HOC)", desc: "Enhance components with additional props or logic" },
+      { name: "Render Props", desc: "Pass a function as prop to share logic" },
+      { name: "Control Props pattern", desc: "Controlled vs uncontrolled components" },
+      { name: "Forwarding Refs with forwardRef", desc: "Pass refs to child components" },
+      { name: "Error Boundaries", desc: "Catch JavaScript errors in component tree" },
+    ],
+    resources: [
+      { label: "React Patterns", url: "https://reactpatterns.com/" },
+      { label: "Compound Components (Kent C. Dodds)", url: "https://kentcdodds.com/blog/compound-components" },
+      { label: "Error Boundaries docs", url: "https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary" },
+    ]
+  },
+  {
+    num: "04",
+    title: "State Management (Context + Redux)",
+    badge: "b4",
+    label: "State",
+    sub: "Project: Shopping cart",
+    desc: `<span class="project-highlight">🛒 Implement a shopping cart</span> — use Context for global state, then migrate to Redux Toolkit for complex actions and middleware.`,
+    skills: [
+      { name: "Context API – createContext, Provider, useContext", desc: "Global state without prop drilling" },
+      { name: "Redux Toolkit – configureStore, createSlice", desc: "Modern Redux with less boilerplate" },
+      { name: "Redux DevTools", desc: "Time‑travel debugging" },
+      { name: "Async actions with createAsyncThunk", desc: "Handle API calls and loading states" },
+      { name: "Selectors & memoization (reselect)", desc: "Optimize derived data" },
+      { name: "Zustand / Jotai – lighter alternatives", desc: "Simpler state management when Redux is overkill" },
+    ],
+    resources: [
+      { label: "Redux Toolkit Docs", url: "https://redux-toolkit.js.org/" },
+      { label: "Zustand", url: "https://docs.pmnd.rs/zustand" },
+      { label: "React Context vs Redux", url: "https://react.dev/learn/scaling-up-with-reducer-and-context" },
+    ]
+  },
+  {
+    num: "05",
+    title: "Routing & Navigation (React Router)",
+    badge: "b5",
+    label: "Routing",
+    sub: "Project: Multi‑page dashboard",
+    desc: `<span class="project-highlight">📄 Build a dashboard with multiple pages</span> — set up React Router v6, nested routes, protected routes, and lazy loading.`,
+    skills: [
+      { name: "React Router v6 – BrowserRouter, Routes, Route", desc: "Declarative routing" },
+      { name: "Nested routes & Outlet", desc: "Layouts with shared UI" },
+      { name: "NavLink, Link, useNavigate", desc: "Navigation and programmatic redirects" },
+      { name: "Route parameters (useParams) and query strings", desc: "Dynamic routing" },
+      { name: "Protected routes (authentication)", desc: "Higher‑order component or wrapper" },
+      { name: "Lazy loading with React.lazy + Suspense", desc: "Code splitting for performance" },
+    ],
+    resources: [
+      { label: "React Router v6 Docs", url: "https://reactrouter.com/" },
+      { label: "Code Splitting in React", url: "https://react.dev/reference/react/lazy" },
+    ]
+  },
+  {
+    num: "06",
+    title: "Forms, Validation & Third‑Party",
+    badge: "b6",
+    label: "Forms",
+    sub: "Project: User registration form",
+    desc: `<span class="project-highlight">📝 Build a complex form with validation</span> — use React Hook Form, Yup/Zod, and handle submission, errors, and accessibility.`,
+    skills: [
+      { name: "Controlled vs uncontrolled inputs", desc: "State management for form fields" },
+      { name: "React Hook Form – performant forms", desc: "Minimal re‑renders, validation integration" },
+      { name: "Validation with Yup / Zod", desc: "Schema‑based validation like Laravel" },
+      { name: "Custom validation rules", desc: "Async validation, cross‑field validation" },
+      { name: "Accessibility (aria, labels, error messages)", desc: "Building inclusive forms" },
+      { name: "File uploads and handling", desc: "Using react‑dropzone or FormData" },
+    ],
+    resources: [
+      { label: "React Hook Form Docs", url: "https://react-hook-form.com/" },
+      { label: "Zod validation", url: "https://zod.dev/" },
+      { label: "Web Accessibility (W3C)", url: "https://www.w3.org/WAI/" },
+    ]
+  },
+  {
+    num: "07",
+    title: "Performance Optimization",
+    badge: "b7",
+    label: "Performance",
+    sub: "Project: Optimize a slow rendering table",
+    desc: `<span class="project-highlight">⚡ Identify and fix performance bottlenecks</span> — use React.memo, useMemo, useCallback, virtualization, and React Profiler.`,
+    skills: [
+      { name: "React.memo & PureComponent", desc: "Prevent unnecessary re‑renders" },
+      { name: "useMemo & useCallback", desc: "Cache expensive computations and stable callbacks" },
+      { name: "Virtualization with react‑window / react‑virtualized", desc: "Render only visible items in lists" },
+      { name: "Code splitting (dynamic imports)", desc: "Lazy load components, routes, and chunks" },
+      { name: "Concurrent features – useTransition, useDeferredValue", desc: "Keep UI responsive during heavy updates" },
+      { name: "Profiling with React DevTools", desc: "Identify components that re‑render too often" },
+    ],
+    resources: [
+      { label: "React Performance Docs", url: "https://react.dev/learn/render-and-commit" },
+      { label: "Virtualization (react-window)", url: "https://react-window.vercel.app/" },
+      { label: "useTransition explained", url: "https://react.dev/reference/react/useTransition" },
+    ]
+  },
+  {
+    num: "08",
+    title: "Testing (Jest + React Testing Library)",
+    badge: "b8",
+    label: "Testing",
+    sub: "Project: Write tests for your app",
+    desc: `<span class="project-highlight">✅ Build a test suite</span> — unit tests for components, integration tests for user interactions, and end‑to‑end with Cypress.`,
+    skills: [
+      { name: "Jest – test runner and assertions", desc: "describe, it, expect, matchers" },
+      { name: "React Testing Library – querying, fireEvent", desc: "Test components like a user" },
+      { name: "Mocking API calls (MSW, jest.mock)", desc: "Simulate network responses" },
+      { name: "Snapshot testing – when to use (and not)", desc: "Avoid fragile tests" },
+      { name: "Coverage reports", desc: "Measure code coverage" },
+      { name: "E2E with Cypress / Playwright", desc: "Full browser automation" },
+    ],
+    resources: [
+      { label: "React Testing Library Docs", url: "https://testing-library.com/react" },
+      { label: "Jest Docs", url: "https://jestjs.io/" },
+      { label: "MSW (Mock Service Worker)", url: "https://mswjs.io/" },
+    ]
+  },
+  {
+    num: "09",
+    title: "Next.js – Full‑Stack React",
+    badge: "b9",
+    label: "Framework",
+    sub: "Project: Blog with SSR & ISR",
+    desc: `<span class="project-highlight">🌐 Build a blog with Next.js</span> — server‑side rendering, static generation, API routes, and incremental static regeneration.`,
+    skills: [
+      { name: "Next.js App Router (or Pages Router)", desc: "File‑based routing, layouts" },
+      { name: "Data fetching – getStaticProps, getServerSideProps", desc: "SSG, SSR, and ISR" },
+      { name: "API routes – backend logic in Next.js", desc: "Build your own API endpoints" },
+      { name: "Server Components (React 19)", desc: "Zero‑bundle components that run on server" },
+      { name: "Image optimization with next/image", desc: "Automatic image resizing and lazy loading" },
+      { name: "Deploy to Vercel (or other platforms)", desc: "Easy deployment with CI" },
+    ],
+    resources: [
+      { label: "Next.js Docs", url: "https://nextjs.org/docs" },
+      { label: "Data Fetching in Next.js", url: "https://nextjs.org/docs/pages/building-your-application/data-fetching" },
+      { label: "Vercel Deployment", url: "https://vercel.com/docs" },
+    ]
+  },
+  {
+    num: "10",
+    title: "Production & Monitoring",
+    badge: "b10",
+    label: "DevOps",
+    sub: "Project: Deploy and monitor a React app",
+    desc: `<span class="project-highlight">🚀 Make your app production‑ready</span> — build optimizations, environment variables, error tracking (Sentry), and performance monitoring (Lighthouse).`,
+    skills: [
+      { name: "Environment variables (.env)", desc: "REACT_APP_* or Next.js env" },
+      { name: "Production build (npm run build)", desc: "Minification, tree shaking, chunking" },
+      { name: "Error tracking with Sentry / LogRocket", desc: "Catch runtime errors in production" },
+      { name: "Performance monitoring – Lighthouse, Web Vitals", desc: "Measure Core Web Vitals" },
+      { name: "Security – Content Security Policy, sanitization", desc: "Protect against XSS" },
+      { name: "CI/CD pipeline (GitHub Actions)", desc: "Automatic testing and deployment" },
+    ],
+    resources: [
+      { label: "Create React App – deployment", url: "https://create-react-app.dev/docs/deployment/" },
+      { label: "Sentry for React", url: "https://docs.sentry.io/platforms/javascript/guides/react/" },
+      { label: "Web Vitals", url: "https://web.dev/vitals/" },
+    ]
+  }
+];
+
+const container = document.getElementById('stages');
+
+stages.forEach((s, i) => {
+  const el = document.createElement('div');
+  el.className = 'stage';
+  el.innerHTML = `
+    <div class="stage-header" onclick="toggle(${i})">
+      <span class="badge ${s.badge}">${s.num} — ${s.label}</span>
+      <span class="stage-title">${s.title}</span>
+      <span class="stage-sub">${s.sub}</span>
+      <span class="chevron" id="chev${i}">▼</span>
+    </div>
+    <div class="stage-body" id="body${i}">
+      <div class="stage-desc">${s.desc}</div>
+      <div class="skills-grid">
+        ${s.skills.map(sk => `
+          <div class="skill-card" onclick="sendPrompt('Explain in depth: ${sk.name} in React with code examples and real‑world use cases')">
+            <div class="skill-name">${sk.name}</div>
+            <div class="skill-desc">${sk.desc}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="resource-box">
+        <div class="resource-title">📚 Resources</div>
+        <div class="resource-list">
+          ${s.resources.map(r => `<span class="resource-item" onclick="openLink('${r.url}')">→ ${r.label}</span>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+  container.appendChild(el);
+});
+
+function toggle(i) {
+  const body = document.getElementById('body'+i);
+  const chev = document.getElementById('chev'+i);
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+
+function openLink(url) {
+  window.open(url, '_blank');
+}
+
+function sendPrompt(text) {
+  const query = encodeURIComponent(text);
+  window.open(`https://www.google.com/search?q=${query}`, '_blank');
+}
+
+toggle(0);
+</script>
