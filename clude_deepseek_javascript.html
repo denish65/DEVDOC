@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript · from zero checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #fef7e6;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 40px -15px rgba(80, 60, 10, 0.2);
+            border: 1px solid #f0e2c4;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #4a3400;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 span {
+            background: #c9920a;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
+        .subhead {
+            color: #7a5c15;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #f0dfb0;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: #fff1cc;
+            color: #5e4500;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 650;
+            color: #4f3800;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            border-left: 6px solid #e0a812;
+            padding-left: 1rem;
+        }
+
+        .section-title .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.5rem 0.75rem;
+            background: #fffdf7;
+            border-radius: 12px;
+            border: 1px solid #f2e5c6;
+            transition: background 0.15s ease, border-color 0.15s;
+            color: #4a3a10;
+            font-size: 0.97rem;
+            line-height: 1.4;
+            cursor: default;
+        }
+
+        .concept-item:hover {
+            background: #fef8e8;
+            border-color: #e8d4a0;
+        }
+
+        .concept-item input[type="checkbox"] {
+            margin-top: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #c9920a;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .concept-text {
+            flex: 1;
+        }
+
+        .concept-text strong {
+            font-weight: 600;
+            color: #4a3400;
+        }
+
+        .meta-note {
+            font-size: 0.85rem;
+            color: #9a7a30;
+            font-style: italic;
+            display: block;
+            margin-top: 0.15rem;
+        }
+
+        .badge-lite {
+            background: #fae4b0;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #4f3800;
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+
+        .website-block {
+            margin-top: 2rem;
+            background: #fff1cc;
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border-left: 8px solid #c9920a;
+        }
+
+        .website-block h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #4a3400;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            list-style: none;
+        }
+
+        .website-list li {
+            background: white;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            border: 1px solid #f0dfb5;
+            font-weight: 500;
+            color: #5e4500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list li::before {
+            content: "🔗";
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff7e5;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            color: #5e4500;
+            font-weight: 500;
+            border: 1px solid #f0dfb0;
+        }
+
+        .progress-summary span {
+            background: #c9920a;
+            color: white;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: #a08640;
+            font-size: 0.9rem;
+            border-top: 1px solid #f0e2c4;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+                border-radius: 1.8rem;
+            }
+            h1 {
+                font-size: 1.7rem;
+                flex-wrap: wrap;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .website-block {
+                padding: 1.2rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🟨 JavaScript
+            <span>from zero</span>
+        </h1>
+        <div class="subhead">
+            <div>Fundamentals → closures → async → DOM → ES6+</div>
+            <div class="badge">📘 assumes nothing</div>
+        </div>
+
+        <!-- interactive counter (purely visual, no JS) -->
+        <div class="progress-summary">
+            <div>✅ Tick concepts as you learn</div>
+            <span>self‑paced</span>
+        </div>
+
+        <!-- SECTION 1: ABSOLUTE FUNDAMENTALS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧱</span> Absolute fundamentals
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Variables: var vs let vs const <span class="meta-note">why var is legacy/problematic</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Data types (string, number, boolean, null, undefined, object, symbol)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Type coercion & == vs ===</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Operators & expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Control flow (if/else, switch, loops — for, while, for...of, for...in)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Functions (declarations, expressions, arrow functions)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Scope (global, function, block scope)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Hoisting <span class="meta-note">why this trips up nearly everyone</span></span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 2: FUNCTIONS — DEEPER -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🔧</span> Functions — deeper
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Parameters vs arguments, default parameters, rest parameters</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Closures <span class="meta-note">single most important JS concept</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">The this keyword <span class="meta-note">behaves differently than you'd expect</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Higher-order functions (take/return functions)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Callback functions <span class="meta-note">underneath every jQuery .click(function(){...})</span></span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 3: OBJECTS & ARRAYS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📦</span> Objects & arrays
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Object literals, property access</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Array methods (map, filter, reduce, forEach) <span class="meta-note">critical, heavily used</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Destructuring (objects & arrays)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Spread & rest operators</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">JSON.stringify / JSON.parse</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 4: ASYNCHRONOUS JAVASCRIPT -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⏳</span> Asynchronous JavaScript
+                <span class="badge-lite">your AJAX foundation</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">The event loop <span class="meta-note">why JS is "single-threaded" but doesn't block</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Callbacks & callback hell</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Promises <span class="meta-note">the real mechanism behind $.ajax</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">async/await (modern syntax over Promises)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">fetch() API <span class="meta-note">native replacement for jQuery's AJAX</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Error handling in async code (try/catch, .catch())</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 5: THE DOM -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🌳</span> The DOM (Document Object Model)
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">What the DOM actually is <span class="meta-note">browser's live object representation of HTML</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Selecting elements (querySelector, getElementById) <span class="meta-note">vanilla equivalents of jQuery's $()</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Event listeners (addEventListener) <span class="meta-note">real mechanism behind jQuery's .on()/.click()</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Event bubbling & capturing, event delegation</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Manipulating the DOM (creating, updating, removing elements)</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 6: MODERN JAVASCRIPT (ES6+) -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">✨</span> Modern JavaScript (ES6+)
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Template literals</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Classes <span class="meta-note">prototypal inheritance underneath, class syntax on top</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Prototypes & prototypal inheritance <span class="meta-note">the real mechanism, not classical like C++/PHP</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Modules (import/export)</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 7: BROWSER & ENVIRONMENT -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🌐</span> Browser & environment concepts
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">window vs document</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">LocalStorage / SessionStorage</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Same-origin policy & CORS <span class="meta-note">explains a LOT of AJAX errors</span></span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 8: WHERE JQUERY FITS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🎯</span> Where jQuery actually fits
+                <span class="badge-lite">conceptual</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">jQuery is a wrapper library <span class="meta-note">simplifies DOM selection/manipulation & AJAX that were painful in old vanilla JS — understanding vanilla JS underneath turns "I use jQuery" into "I understand what jQuery is doing for me"</span></span></label>
+            </div>
+        </div>
+
+        <!-- WEBSITES -->
+        <div class="website-block">
+            <h3>🌐 Where to learn JavaScript (deep & free)</h3>
+            <ul class="website-list">
+                <li><strong>javascript.info</strong> — best deep, structured, free JS resource (basics → async/closures/prototypes)</li>
+                <li><strong>MDN Web Docs</strong> — official reference, best for DOM APIs & definitive explanations</li>
+                <li><strong>freeCodeCamp JS curriculum</strong> — free, interactive, project-based practice</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Tick boxes as you master each concept — pure JavaScript roadmap from zero.
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ OOP · checklist & roadmap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f0f4fa;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 40px -15px rgba(0, 20, 30, 0.25);
+            border: 1px solid #d9e2ef;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #0b2b4a;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 span {
+            background: #1e3b5c;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
+        .subhead {
+            color: #2c5779;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #cbd9e9;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: #e5eff9;
+            color: #0f3b5e;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 650;
+            color: #113355;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            padding-left: 0.2rem;
+            border-left: 6px solid #3b7fb0;
+            padding-left: 1rem;
+        }
+
+        .section-title .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.5rem 0.75rem;
+            background: #f8fcff;
+            border-radius: 12px;
+            border: 1px solid #d4e3f2;
+            transition: background 0.15s ease, border-color 0.15s;
+            color: #1d3e5c;
+            font-size: 0.97rem;
+            line-height: 1.4;
+            cursor: default;
+        }
+
+        .concept-item:hover {
+            background: #e9f2fc;
+            border-color: #b0cde0;
+        }
+
+        .concept-item input[type="checkbox"] {
+            margin-top: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #1e5b8a;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .concept-text {
+            flex: 1;
+        }
+
+        .concept-text strong {
+            font-weight: 600;
+            color: #0a2942;
+        }
+
+        .meta-note {
+            font-size: 0.85rem;
+            color: #45749b;
+            font-style: italic;
+            display: block;
+            margin-top: 0.15rem;
+        }
+
+        .badge-lite {
+            background: #cfe2f5;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #113a5a;
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+
+        .website-block {
+            margin-top: 2rem;
+            background: #e5eff9;
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border-left: 8px solid #1e3b5c;
+        }
+
+        .website-block h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #0b2b4a;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            list-style: none;
+        }
+
+        .website-list li {
+            background: white;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            border: 1px solid #ccddec;
+            font-weight: 500;
+            color: #1a4668;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list li::before {
+            content: "🔗";
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eef5fc;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            color: #17476b;
+            font-weight: 500;
+            border: 1px solid #bfd7eb;
+        }
+
+        .progress-summary span {
+            background: #1e3b5c;
+            color: white;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: #517e9e;
+            font-size: 0.9rem;
+            border-top: 1px solid #d2e0ed;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+                border-radius: 1.8rem;
+            }
+            h1 {
+                font-size: 1.7rem;
+                flex-wrap: wrap;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .website-block {
+                padding: 1.2rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            ⚙️ C++ OOP & core
+            <span>checklist</span>
+        </h1>
+        <div class="subhead">
+            <div>From raw pointers to smart pointers · modern C++</div>
+            <div class="badge">📘 100% concept coverage</div>
+        </div>
+
+        <!-- interactive counter (purely visual, no JS) -->
+        <div class="progress-summary">
+            <div>✅ Tick concepts as you learn</div>
+            <span>self‑paced</span>
+        </div>
+
+        <!-- SECTION 1: LANGUAGE FUNDAMENTALS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧱</span> Language fundamentals
+                <span class="badge-lite">before OOP</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Variables, data types, type casting</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Operators & expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Control flow (if/else, switch, loops)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Functions, function overloading, default arguments</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Arrays & strings (C-style)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Pointers <span class="meta-note">fundamental to everything after</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">References vs pointers</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Memory: stack vs heap</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Dynamic memory allocation (new/delete)</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 2: OOP CORE PILLARS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏛️</span> OOP core pillars
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Classes & objects</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Access modifiers (public/private/protected)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Constructors (default, parameterized, copy) & destructors</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">this pointer</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Encapsulation</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Inheritance (single, multiple, multilevel, hierarchical)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Polymorphism (compile-time vs run-time)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Function overloading vs operator overloading</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Virtual functions & the vtable mechanism</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Pure virtual functions & abstract classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Abstraction (interfaces via abstract classes)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Friend functions & friend classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Static members (variables & functions)</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 3: INTERMEDIATE / ADVANCED OOP -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧠</span> Intermediate / advanced OOP
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Object slicing</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Diamond problem & virtual inheritance</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Copy constructor vs copy assignment operator</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Move semantics & move constructor (C++11+)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Rule of three / Rule of five</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Smart pointers (unique_ptr, shared_ptr, weak_ptr)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">RAII (Resource Acquisition Is Initialization)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Exception handling (try/catch/throw, custom exceptions)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Templates (function & class templates)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Namespaces</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 4: STL -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📦</span> Standard Template Library (STL)
+                <span class="badge-lite">essential</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Containers (vector, map, set, list, etc.)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Iterators</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Algorithms (sort, find, etc.)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Lambda expressions</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 5: MODERN C++ -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">✨</span> Modern C++ concepts
+                <span class="badge-lite">good to know</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">auto keyword & type inference</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">constexpr</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Structured bindings</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Move semantics (tied to above)</span></label>
+            </div>
+        </div>
+
+        <!-- WEBSITES -->
+        <div class="website-block">
+            <h3>🌐 Where to learn C++ (deep & free)</h3>
+            <ul class="website-list">
+                <li><strong>learncpp.com</strong> — best free, in-depth, text-based C++ resource (fundamentals → advanced OOP & modern C++)</li>
+                <li><strong>Educative "Learn C++ from Scratch"</strong> — interactive, browser-based, no compiler setup</li>
+                <li><strong>cplusplus.com / cppreference.com</strong> — official-style reference for syntax/STL lookup</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Tick boxes as you master each concept — pure C++ OOP roadmap.
+        </div>
+    </div>
+
+    <!-- tiny script to make localStorage optional? no — keep it pure, no JS needed. 
+         interactive checkboxes work natively. -->
+</body>
+</html>

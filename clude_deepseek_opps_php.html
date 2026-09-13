@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHP OOP · checklist & roadmap</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #f3f0fa;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 40px -15px rgba(30, 20, 60, 0.22);
+            border: 1px solid #ded8f0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #2b1a5e;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 span {
+            background: #5a3d9a;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
+        .subhead {
+            color: #4a3a7a;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #d3c9ec;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: #ece6fc;
+            color: #3b2670;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 650;
+            color: #2f1f62;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            border-left: 6px solid #7b5fc0;
+            padding-left: 1rem;
+        }
+
+        .section-title .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.5rem 0.75rem;
+            background: #faf8ff;
+            border-radius: 12px;
+            border: 1px solid #e2daf5;
+            transition: background 0.15s ease, border-color 0.15s;
+            color: #35285a;
+            font-size: 0.97rem;
+            line-height: 1.4;
+            cursor: default;
+        }
+
+        .concept-item:hover {
+            background: #f0ebff;
+            border-color: #c5b6e6;
+        }
+
+        .concept-item input[type="checkbox"] {
+            margin-top: 0.2rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #5a3d9a;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .concept-text {
+            flex: 1;
+        }
+
+        .concept-text strong {
+            font-weight: 600;
+            color: #2b1a5e;
+        }
+
+        .meta-note {
+            font-size: 0.85rem;
+            color: #6b5b99;
+            font-style: italic;
+            display: block;
+            margin-top: 0.15rem;
+        }
+
+        .badge-lite {
+            background: #ddd2f5;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.15rem 0.6rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #2e1d62;
+            display: inline-block;
+            margin-left: 0.3rem;
+        }
+
+        .website-block {
+            margin-top: 2rem;
+            background: #ece6fc;
+            padding: 1.5rem 2rem;
+            border-radius: 2rem;
+            border-left: 8px solid #5a3d9a;
+        }
+
+        .website-block h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #2b1a5e;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            list-style: none;
+        }
+
+        .website-list li {
+            background: white;
+            padding: 0.6rem 1.3rem;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            border: 1px solid #d9cdf2;
+            font-weight: 500;
+            color: #35285a;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list li::before {
+            content: "🔗";
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f3efff;
+            padding: 0.8rem 1.5rem;
+            border-radius: 60px;
+            margin-bottom: 2rem;
+            color: #3a2b6b;
+            font-weight: 500;
+            border: 1px solid #d5c8f0;
+        }
+
+        .progress-summary span {
+            background: #5a3d9a;
+            color: white;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            margin-top: 2.5rem;
+            text-align: center;
+            color: #7a6ba8;
+            font-size: 0.9rem;
+            border-top: 1px solid #ded8f0;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+                border-radius: 1.8rem;
+            }
+            h1 {
+                font-size: 1.7rem;
+                flex-wrap: wrap;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .website-block {
+                padding: 1.2rem 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🐘 PHP OOP
+            <span>checklist</span>
+        </h1>
+        <div class="subhead">
+            <div>Core pillars → traits → magic methods → modern PHP 8+</div>
+            <div class="badge">📘 object-oriented deep dive</div>
+        </div>
+
+        <!-- interactive counter (purely visual, no JS) -->
+        <div class="progress-summary">
+            <div>✅ Tick concepts as you learn</div>
+            <span>self‑paced</span>
+        </div>
+
+        <!-- SECTION 1: OOP CORE PILLARS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏛️</span> OOP core pillars
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Classes & objects</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Properties & methods</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Constructors & destructors (__construct, __destruct)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Access modifiers (public/private/protected)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Encapsulation</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Inheritance (extends)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Method overriding</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Polymorphism</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Abstraction (abstract classes)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Interfaces (implements) & multiple interface implementation</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Static properties & methods</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">self vs static vs parent <span class="meta-note">common PHP confusion point</span></span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 2: TRAITS & COMPOSITION -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧩</span> Traits & composition
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Traits <span class="meta-note">PHP's answer to lacking multiple inheritance</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Trait conflict resolution (insteadof, as)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Composition over inheritance principle</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 3: MAGIC METHODS -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">✨</span> Magic methods
+                <span class="badge-lite">heavily used in Laravel</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__get / __set (property overloading)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__call / __callStatic (method overloading)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__toString</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__invoke</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__clone</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 4: ADVANCED OOP -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧠</span> Advanced OOP
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Namespaces</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Autoloading (PSR-4) <span class="meta-note">classes loaded without manual require</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Late static binding</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Readonly properties (PHP 8.1+)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Enums (PHP 8.1+)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Null safe operator & type declarations (union, nullable)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Anonymous classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Object cloning (shallow vs deep)</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 5: DESIGN-LEVEL OOP -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📐</span> Design-level OOP concepts
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">SOLID principles <span class="meta-note">SRP, OCP, LSP, ISP, DIP</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Dependency Injection <span class="meta-note">before tying it to Laravel's container</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Factory pattern</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Singleton pattern</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Strategy pattern</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Observer pattern</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Repository pattern</span></label>
+            </div>
+        </div>
+
+        <!-- SECTION 6: ERROR & EXCEPTION HANDLING -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⚠️</span> Error & exception handling
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Try/catch/finally</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Custom exception classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Exception hierarchies</span></label>
+            </div>
+        </div>
+
+        <!-- WEBSITES -->
+        <div class="website-block">
+            <h3>🌐 Where to learn PHP OOP (deep & free)</h3>
+            <ul class="website-list">
+                <li><strong>PHP.net official manual (OOP section)</strong> — authoritative, well-written reference</li>
+                <li><strong>phptherightway.com</strong> — community best-practices guide for OOP + modern PHP</li>
+                <li><strong>Laracasts free PHP series</strong> — clear PHP fundamentals & OOP even outside Laravel</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Tick boxes as you master each concept — pure PHP OOP roadmap.
+        </div>
+    </div>
+</body>
+</html>
