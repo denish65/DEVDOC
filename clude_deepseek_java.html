@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Java · complete roadmap & checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #eef4fb;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1050px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 45px -18px rgba(10, 35, 70, 0.28);
+            border: 1px solid #d3e2f2;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #0c2d4e;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 span {
+            background: #1e4b7a;
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
+        .subhead {
+            color: #2c5a82;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #c8dcee;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: #e2eef9;
+            color: #123e63;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.45rem;
+            font-weight: 650;
+            color: #103a5c;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            border-left: 6px solid #2e6da4;
+            padding-left: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.55rem 0.85rem;
+            background: #f7fbff;
+            border-radius: 12px;
+            border: 1px solid #d5e6f5;
+            transition: background 0.15s ease, border-color 0.15s;
+            color: #1b3d5c;
+            font-size: 0.96rem;
+            line-height: 1.45;
+            cursor: default;
+        }
+
+        .concept-item:hover {
+            background: #eaf3fc;
+            border-color: #b0cee8;
+        }
+
+        .concept-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #1e4b7a;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .concept-text {
+            flex: 1;
+        }
+
+        .concept-text strong {
+            font-weight: 600;
+            color: #0a2c4a;
+        }
+
+        .meta-note {
+            font-size: 0.84rem;
+            color: #477ba8;
+            font-style: italic;
+            display: block;
+            margin-top: 0.18rem;
+        }
+
+        .badge-lite {
+            background: #cde2f5;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.18rem 0.65rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #0b3353;
+            display: inline-block;
+            margin-left: 0.3rem;
+            white-space: nowrap;
+        }
+
+        .website-block {
+            margin-top: 2.2rem;
+            background: #e2eef9;
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            border-left: 8px solid #1e4b7a;
+        }
+
+        .website-block h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #0c2d4e;
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            list-style: none;
+        }
+
+        .website-list li {
+            background: white;
+            padding: 0.65rem 1.4rem;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1px solid #c9ddef;
+            font-weight: 500;
+            color: #143e61;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.95rem;
+        }
+
+        .website-list li::before {
+            content: "🔗";
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #eef6fe;
+            padding: 0.85rem 1.6rem;
+            border-radius: 60px;
+            margin-bottom: 2.2rem;
+            color: #17466e;
+            font-weight: 500;
+            border: 1px solid #c4dcf0;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .progress-summary span {
+            background: #1e4b7a;
+            color: white;
+            padding: 0.25rem 1.1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            margin-top: 2.8rem;
+            text-align: center;
+            color: #4f7fa3;
+            font-size: 0.9rem;
+            border-top: 1px solid #d3e2f2;
+            padding-top: 1.6rem;
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+                border-radius: 1.8rem;
+            }
+            h1 {
+                font-size: 1.65rem;
+                flex-wrap: wrap;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .website-block {
+                padding: 1.2rem 1.2rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            ☕ Java
+            <span>complete roadmap</span>
+        </h1>
+        <div class="subhead">
+            <div>Core → OOP → generics → collections → concurrency → frameworks</div>
+            <div class="badge">📘 every topic covered</div>
+        </div>
+
+        <div class="progress-summary">
+            <div>✅ Tick concepts as you learn</div>
+            <span>self‑paced</span>
+        </div>
+
+        <!-- ==================== CORE FUNDAMENTALS ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧱</span> Core fundamentals
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Variables, primitive types vs reference types</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Type casting (implicit/explicit)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Operators & expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Control flow (if/else, switch, loops)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Arrays (single & multi-dimensional)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Methods (parameters, return types, overloading)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">static vs instance context</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Command-line arguments, the main method's exact signature <span class="meta-note">and why it matters</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== OOP CORE PILLARS ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏛️</span> OOP core pillars
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Classes & objects</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Constructors (default, parameterized, overloading, chaining via this())</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Access modifiers (public/private/protected/default/package-private)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Encapsulation</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Inheritance (extends, single inheritance only for classes)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">super keyword</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Polymorphism (compile-time/overloading vs run-time/overriding)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Abstraction (abstract classes vs interfaces)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Interfaces (multiple implementation, default & static methods in interfaces)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">this keyword</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== INTERMEDIATE OOP ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧠</span> Intermediate OOP
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Object class methods: equals(), hashCode(), toString() <span class="meta-note">why overriding them correctly matters</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">equals() vs == (value vs reference comparison)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Immutability (designing immutable classes, final keyword on classes/methods/variables)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Composition vs inheritance</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Inner classes, static nested classes, local classes, anonymous classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Enums <span class="meta-note">Java enums are full classes, not just constants — common surprise for PHP/C++ devs</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Packages & access control across packages</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== EXCEPTION HANDLING ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⚠️</span> Exception handling
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Checked vs unchecked exceptions <span class="meta-note">a distinctly Java concept</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">try/catch/finally</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">try-with-resources (auto-closing resources)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Custom exception classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Exception chaining</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== GENERICS ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🔤</span> Generics
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Generic classes & methods</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Bounded type parameters</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Wildcards (? extends, ? super)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Type erasure <span class="meta-note">why generics behave the way they do at runtime</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== COLLECTIONS FRAMEWORK ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📦</span> Collections framework
+                <span class="badge-lite">essential · heavily tested</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">List, Set, Map, Queue interfaces & their implementations (ArrayList, LinkedList, HashSet, TreeSet, HashMap, TreeMap, etc.)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Iterator & Iterable</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Comparable vs Comparator</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Collections utility class (sorting, searching)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== JAVA 8+ MODERN ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">✨</span> Java 8+ modern concepts
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Lambda expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Functional interfaces (Runnable, Supplier, Consumer, Function, Predicate)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Stream API (map, filter, reduce, collect)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Optional (avoiding null checks)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Method references</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== MEMORY & RUNTIME ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧬</span> Memory & runtime concepts
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">JVM, JRE, JDK distinction</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Stack vs heap memory</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Garbage collection <span class="meta-note">concept-level: how objects get reclaimed</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Autoboxing/unboxing (primitive ↔ wrapper class conversion)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">String pool & String immutability <span class="meta-note">why String behaves specially</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">StringBuilder vs StringBuffer vs String (mutability & thread-safety)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== CONCURRENCY ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⚡</span> Concurrency
+                <span class="badge-lite">Java's differentiator</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Threads (creating via Thread class vs Runnable)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Thread lifecycle</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Synchronization (synchronized keyword, locks)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Race conditions & deadlocks <span class="meta-note">conceptually, same as DB concurrency but at the app level</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">volatile keyword</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Executor framework & thread pools</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">CompletableFuture (modern async programming in Java)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== I/O & SERIALIZATION ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">💾</span> I/O & serialization
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">File I/O (Streams, Readers/Writers)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Serialization/Deserialization (Serializable interface)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== ADVANCED / ARCHITECTURE ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏗️</span> Advanced / architecture-level
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">SOLID principles <span class="meta-note">Java is where these were most heavily formalized</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Design patterns (Singleton, Factory, Builder, Observer, Strategy) <span class="meta-note">Java is the classic language design patterns are taught in</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Dependency Injection <span class="meta-note">the concept, before tying to a framework</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Annotations (built-in and custom) <span class="meta-note">the mechanism frameworks like Spring build entirely around</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Reflection API <span class="meta-note">inspecting classes/methods at runtime — how frameworks achieve their "magic"</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Modules (Java Platform Module System, Java 9+)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== TESTING ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧪</span> Testing
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Unit testing concepts <span class="meta-note">JUnit is the de facto standard</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Mocking concepts <span class="meta-note">Mockito is the standard library</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== WHERE FRAMEWORKS FIT ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🚀</span> Where frameworks fit
+                <span class="badge-lite">mentioned only · not detail</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Spring / Spring Boot <span class="meta-note">dominant enterprise/web backend framework — built heavily on DI + Annotations + Reflection (everything above prepares you directly for this)</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Hibernate / JPA <span class="meta-note">standard ORM layer, conceptually parallel to Eloquent</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Maven / Gradle <span class="meta-note">build tools, not frameworks, but essential tooling once projects grow</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== WEBSITES ==================== -->
+        <div class="website-block">
+            <h3>🌐 Where to learn Java (deep & free)</h3>
+            <ul class="website-list">
+                <li><strong>dev.java</strong> — Oracle's official modern Java learning hub, well-structured</li>
+                <li><strong>Baeldung</strong> — best in-depth tutorials for Java, Spring, concurrency & collections</li>
+                <li><strong>JavaTPoint / GeeksforGeeks</strong> — quick reference for syntax, collections & interview topics</li>
+                <li><strong>Oracle Java Docs</strong> — authoritative reference for the language & standard library</li>
+                <li><strong>Jenkov.com</strong> — excellent deep dives on concurrency, NIO & JVM internals</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Tick boxes as you master each concept — complete Java roadmap from fundamentals to frameworks.
+        </div>
+    </div>
+</body>
+</html>

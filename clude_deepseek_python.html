@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python · complete roadmap & checklist</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: #eef7f2;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1050px;
+            width: 100%;
+            background: white;
+            border-radius: 2.5rem;
+            padding: 2.5rem 2rem;
+            box-shadow: 0 25px 45px -18px rgba(10, 60, 40, 0.22);
+            border: 1px solid #cfe8dc;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #0d3b2e;
+            margin-bottom: 0.25rem;
+        }
+
+        h1 span {
+            background: #1e6b52;
+            color: white;
+            font-size: 1.05rem;
+            font-weight: 500;
+            padding: 0.2rem 1rem;
+            border-radius: 100px;
+            letter-spacing: 0.3px;
+            margin-left: 0.5rem;
+        }
+
+        .subhead {
+            color: #2c6b55;
+            font-size: 1.1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px dashed #c2e0d2;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .badge {
+            background: #ddf0e6;
+            color: #0f4536;
+            font-weight: 500;
+            padding: 0.25rem 1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.45rem;
+            font-weight: 650;
+            color: #10402f;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            border-left: 6px solid #2a8b6a;
+            padding-left: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .section-title .emoji {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 0.75rem 1.5rem;
+            margin-top: 0.75rem;
+        }
+
+        .concept-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7rem;
+            padding: 0.55rem 0.85rem;
+            background: #f7fdfa;
+            border-radius: 12px;
+            border: 1px solid #d2eadf;
+            transition: background 0.15s ease, border-color 0.15s;
+            color: #1b4a3a;
+            font-size: 0.96rem;
+            line-height: 1.45;
+            cursor: default;
+        }
+
+        .concept-item:hover {
+            background: #ebf8f2;
+            border-color: #aad4c2;
+        }
+
+        .concept-item input[type="checkbox"] {
+            margin-top: 0.25rem;
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #1e6b52;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .concept-text {
+            flex: 1;
+        }
+
+        .concept-text strong {
+            font-weight: 600;
+            color: #0c3528;
+        }
+
+        .meta-note {
+            font-size: 0.84rem;
+            color: #4a8a72;
+            font-style: italic;
+            display: block;
+            margin-top: 0.18rem;
+        }
+
+        .badge-lite {
+            background: #c9e8da;
+            font-size: 0.68rem;
+            font-weight: 600;
+            padding: 0.18rem 0.65rem;
+            border-radius: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            color: #0b3a2b;
+            display: inline-block;
+            margin-left: 0.3rem;
+            white-space: nowrap;
+        }
+
+        .website-block {
+            margin-top: 2.2rem;
+            background: #ddf0e6;
+            padding: 1.6rem 2rem;
+            border-radius: 2rem;
+            border-left: 8px solid #1e6b52;
+        }
+
+        .website-block h3 {
+            font-size: 1.3rem;
+            font-weight: 650;
+            color: #0d3b2e;
+            margin-bottom: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .website-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            list-style: none;
+        }
+
+        .website-list li {
+            background: white;
+            padding: 0.65rem 1.4rem;
+            border-radius: 40px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            border: 1px solid #c0e0d2;
+            font-weight: 500;
+            color: #143e30;
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            font-size: 0.95rem;
+        }
+
+        .website-list li::before {
+            content: "🔗";
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #e9f6f0;
+            padding: 0.85rem 1.6rem;
+            border-radius: 60px;
+            margin-bottom: 2.2rem;
+            color: #175a45;
+            font-weight: 500;
+            border: 1px solid #b9dfce;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .progress-summary span {
+            background: #1e6b52;
+            color: white;
+            padding: 0.25rem 1.1rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+        }
+
+        .footer-note {
+            margin-top: 2.8rem;
+            text-align: center;
+            color: #4a8a72;
+            font-size: 0.9rem;
+            border-top: 1px solid #cfe8dc;
+            padding-top: 1.6rem;
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding: 1rem 0.75rem;
+            }
+            .container {
+                padding: 1.5rem 1rem;
+                border-radius: 1.8rem;
+            }
+            h1 {
+                font-size: 1.65rem;
+                flex-wrap: wrap;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .website-block {
+                padding: 1.2rem 1.2rem;
+            }
+            .section-title {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🐍 Python
+            <span>complete roadmap</span>
+        </h1>
+        <div class="subhead">
+            <div>Fundamentals → data structures → OOP → async → frameworks</div>
+            <div class="badge">📘 every topic covered</div>
+        </div>
+
+        <div class="progress-summary">
+            <div>✅ Tick concepts as you learn</div>
+            <span>self‑paced</span>
+        </div>
+
+        <!-- ==================== CORE FUNDAMENTALS ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧱</span> Core fundamentals
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Variables & dynamic typing <span class="meta-note">no explicit type declarations, but still strongly typed under the hood</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Data types (int, float, str, bool, None)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Operators & expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Control flow (if/elif/else, while, for)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Functions (default arguments, *args, **kwargs, keyword-only arguments)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Indentation-based syntax <span class="meta-note">why this matters structurally, not just stylistically</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Scope (local, enclosing, global, built-in) <span class="meta-note">the "LEGB" rule</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== CORE DATA STRUCTURES ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📦</span> Core data structures
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Lists, tuples, sets, dictionaries <span class="meta-note">and precisely when to use which</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">List, dict, set comprehensions & generator expressions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Slicing <span class="meta-note">a very Python-specific and powerful concept</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Mutability vs immutability <span class="meta-note">lists vs tuples, and why this matters for function arguments</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Unpacking (tuple unpacking, * unpacking)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== FUNCTIONS — DEEPER ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🔧</span> Functions — deeper
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">First-class functions <span class="meta-note">functions as values, passed around like any variable</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Closures</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Decorators <span class="meta-note">a distinctly important Python concept — functions that wrap other functions</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Lambda functions</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Generators & the yield keyword <span class="meta-note">lazy evaluation, memory-efficient iteration</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Iterators & the iterator protocol (__iter__, __next__)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== OOP IN PYTHON ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏛️</span> OOP in Python
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Classes & objects</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__init__ constructor</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Instance vs class variables</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Instance methods vs @classmethod vs @staticmethod</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Inheritance <span class="meta-note">including Python's support for multiple inheritance</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Method Resolution Order (MRO) <span class="meta-note">how Python resolves multiple inheritance conflicts</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">super()</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Encapsulation conventions <span class="meta-note">single/double underscore naming instead of enforced private/protected — "we're all consenting adults"</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Polymorphism & duck typing <span class="meta-note">"if it walks like a duck..." — behavior over strict type</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Abstract Base Classes (abc module)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Magic/dunder methods (__str__, __repr__, __eq__, __len__, __add__, etc.) <span class="meta-note">operator overloading in Python</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Properties (@property decorator) <span class="meta-note">Pythonic getters/setters</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Dataclasses <span class="meta-note">modern, boilerplate-free class definitions</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== EXCEPTION HANDLING ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⚠️</span> Exception handling
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">try/except/else/finally</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Custom exception classes</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Exception hierarchies</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Context managers (with statement) & __enter__/__exit__ protocol</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== MODULES & PACKAGES ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📁</span> Modules & packages
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Import system, module vs package distinction</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">__init__.py purpose</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Virtual environments (venv) <span class="meta-note">essential, not optional, for any real Python project</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Package management (pip, requirements.txt, and briefly Poetry as the modern alternative)</span></label>
+            </div>
+        </div>
+
+        <!-- ==================== FUNCTIONAL & ADVANCED ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">✨</span> Functional & advanced language features
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Functional programming tools (map, filter, reduce, functools)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">*args/**kwargs deeper usage patterns</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Type hints <span class="meta-note">modern Python — optional static typing on top of dynamic typing</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">itertools module concepts <span class="meta-note">efficient looping constructs</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== CONCURRENCY & PARALLELISM ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">⚡</span> Concurrency & parallelism
+                <span class="badge-lite">often misunderstood</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">The Global Interpreter Lock (GIL) <span class="meta-note">why Python threading behaves differently than Java's</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Threading <span class="meta-note">best for I/O-bound tasks</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Multiprocessing <span class="meta-note">best for CPU-bound tasks, because of the GIL</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">asyncio, async/await <span class="meta-note">modern async model — conceptually parallel to JavaScript's, but with real differences</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== MEMORY & INTERNALS ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧬</span> Memory & internals
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">How Python manages memory (reference counting + garbage collection)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Everything is an object in Python <span class="meta-note">even functions, classes, modules — a core philosophical difference from Java/C++</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Mutable default argument pitfall <span class="meta-note">a very well-known Python gotcha worth knowing conceptually</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== TESTING ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🧪</span> Testing
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Unit testing concepts <span class="meta-note">unittest built-in, pytest as the modern standard</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Mocking (unittest.mock)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Fixtures <span class="meta-note">pytest concept</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== DATA HANDLING ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">📊</span> Data handling
+                <span class="badge-lite">Python's strength area</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">File I/O</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Working with structured data (CSV, JSON, APIs via requests)</span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Awareness that Python dominates data science/ML tooling <span class="meta-note">NumPy/Pandas exist — explains why Python looks the way it does in job postings</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== ADVANCED / ARCHITECTURE ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🏗️</span> Advanced / architecture-level
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">SOLID principles <span class="meta-note">same universal principles, Python syntax</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Design patterns in a dynamically-typed language <span class="meta-note">some patterns look different in Python than Java — e.g., you often don't need Strategy boilerplate, you just pass a function</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Dependency Injection <span class="meta-note">less rigid in Python than Java due to dynamic typing</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Metaclasses <span class="meta-note">advanced, rarely needed day-to-day, but explains "how classes are created" — good to know exists</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== WHERE FRAMEWORKS FIT ==================== -->
+        <div class="section">
+            <div class="section-title">
+                <span class="emoji">🚀</span> Where frameworks fit
+                <span class="badge-lite">mentioned only</span>
+            </div>
+            <div class="grid">
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Django <span class="meta-note">dominant "batteries-included" framework — ORM, admin panel, auth built-in, conceptually similar to Laravel</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">Flask / FastAPI <span class="meta-note">lightweight/micro frameworks; FastAPI is now standard for modern async APIs and leans heavily on type hints</span></span></label>
+                <label class="concept-item"><input type="checkbox"> <span class="concept-text">SQLAlchemy <span class="meta-note">standard ORM, roughly Python's equivalent of Eloquent</span></span></label>
+            </div>
+        </div>
+
+        <!-- ==================== WEBSITES ==================== -->
+        <div class="website-block">
+            <h3>🌐 Where to learn Python (deep & free)</h3>
+            <ul class="website-list">
+                <li><strong>docs.python.org</strong> — official docs, excellent tutorial & language reference</li>
+                <li><strong>Real Python</strong> — best deep tutorials for OOP, decorators, async & internals</li>
+                <li><strong>Python Crash Course (free chapters)</strong> — great project-based beginner resource</li>
+                <li><strong>Corey Schafer's YouTube</strong> — clear, deep explanations of Python-specific concepts</li>
+                <li><strong>pytest docs / unittest docs</strong> — authoritative testing references</li>
+            </ul>
+        </div>
+
+        <div class="footer-note">
+            ⚡ Tick boxes as you master each concept — complete Python roadmap from fundamentals to frameworks.
+        </div>
+    </div>
+</body>
+</html>
